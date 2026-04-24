@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta name="darkreader-lock">
-<title>Chris Trolitsch Job Pipeline Dashboard v6</title>
+<title>Chris Trolitsch Job Pipeline Dashboard V8</title>
 <script src="https://accounts.google.com/gsi/client" async defer></script>
 <script src="https://alcdn.msauth.net/browser/2.38.3/js/msal-browser.min.js" async defer></script>
 <style>
@@ -666,7 +666,7 @@ input, select, textarea {
   <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem; margin-left: 60px;">
     <h1 id="dashboard-title" style="margin: 0;">
       Job Pipeline Dashboard for Chris Trolitsch
-      <span style="font-size: 12px; font-weight: normal; color: var(--color-text-info); background: var(--color-background-info); padding: 4px 8px; border-radius: 4px; margin-left: 12px;">v6.0</span>
+      <span style="font-size: 12px; font-weight: normal; color: var(--color-text-info); background: var(--color-background-info); padding: 4px 8px; border-radius: 4px; margin-left: 12px;">V8</span>
     </h1>
   </div>
   
@@ -6843,7 +6843,7 @@ function exportData() {
       governance: governanceItems,
       starStories: starStories,
       exportDate: new Date().toISOString(),
-      version: '6.0'
+      version: '8.0'
     };
     const dataStr = JSON.stringify(data, null, 2);
     const dataBlob = new Blob([dataStr], { type: 'application/json' });
@@ -9148,7 +9148,7 @@ async function syncODLoad() {
 function syncBuildPayload() {
   return JSON.stringify({
     exportedAt: new Date().toISOString(),
-    exportVersion: '4.0',
+    exportVersion: '8.0',
     applications: allApplications,
     contacts: warmLeadsContacts,
     starStories: starStories,
