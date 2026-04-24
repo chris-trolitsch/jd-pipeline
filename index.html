@@ -3141,8 +3141,10 @@ function saveAppChanges() {
   document.dispatchEvent(new CustomEvent('app-saved'));
 
   const statusDiv = document.getElementById('app-save-status');
-  statusDiv.textContent = '✓ Changes saved';
-  setTimeout(() => statusDiv.textContent = '', 2000);
+  if (statusDiv) {
+    statusDiv.textContent = '✓ Changes saved';
+    setTimeout(() => { if (statusDiv) statusDiv.textContent = ''; }, 2000);
+  }
   const now = new Date();
   const lastSavedStr = 'Last saved ' + now.toLocaleTimeString([], {hour: '2-digit', minute: '2-digit'});
   ['app-last-saved', 'app-last-saved-additional', 'popout-last-saved'].forEach(id => {
@@ -9378,7 +9380,7 @@ function selectSyncProvider(provider) {
     <div id="popout-save-bar">
       <span id="popout-status-badge"></span>
       <span id="popout-save-msg" style="font-size: 12px; color: #a8d5a2;"></span>
-      <button onclick="saveAppChanges(); notifyParentOfSave();" style="padding: 7px 18px; background: #198754; color: white; border: none; border-radius: 5px; font-size: 13px; font-weight: 600; cursor: pointer;">💾 Save</button>
+      <button onclick="saveAppChanges();" style="padding: 7px 18px; background: #198754; color: white; border: none; border-radius: 5px; font-size: 13px; font-weight: 600; cursor: pointer;">💾 Save</button>
       <button onclick="window.close();" style="padding: 7px 14px; background: rgba(255,255,255,0.1); color: white; border: 1px solid rgba(255,255,255,0.2); border-radius: 5px; font-size: 13px; cursor: pointer;">✕ Close</button>
     </div>
   </div>
