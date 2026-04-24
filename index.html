@@ -4690,7 +4690,7 @@ function renderList() {
       : '<span class="badge badge-fulltime">FT</span>';
     
     const starBadge = app.confidenceScore >= 9 
-      ? '<div style="margin-top: 4px;"><span style="font-size: 10px; background: var(--color-background-warning); color: var(--color-text-warning); padding: 2px 6px; border-radius: 3px;">⭐ High Confidence</span></div>' 
+      ? '<div style="margin-top: 4px;"><span style="font-size: 10px; background: rgba(255,193,7,0.15); color: #ffc107; border: 1px solid rgba(255,193,7,0.4); padding: 2px 6px; border-radius: 3px;">⭐ High Confidence</span></div>' 
       : '';
     
     // Interview badge (green for upcoming)
@@ -8696,12 +8696,25 @@ function initPopoutMode() {
   }
 
   // Render the full editable detail view into popout-detail
-  // Re-use selectApp which writes into #detail element — we redirect it
-  const detailEl = document.getElementById('detail');
-  if (detailEl) {
+  // Temporarily show detail-view so selectApp can write into it,
+  // then transplant the result into the popout panel
+  const detailView = document.getElementById('detail-view');
+  const pipelineCol = detailView ? detailView.parentElement : null;
+  if (detailView && pipelineCol) {
+    // Briefly make the container visible off-screen so selectApp renders correctly
+    pipelineCol.style.position = 'absolute';
+    pipelineCol.style.left = '-9999px';
+    pipelineCol.style.display = 'block';
     selectApp(app);
-    // Move the rendered detail content into the popout panel
-    document.getElementById('popout-detail').appendChild(detailEl);
+    // Move rendered content into popout panel
+    const popoutDetail = document.getElementById('popout-detail');
+    while (detailView.firstChild) {
+      popoutDetail.appendChild(detailView.firstChild);
+    }
+    // Hide the original container again
+    pipelineCol.style.display = 'none';
+    pipelineCol.style.position = '';
+    pipelineCol.style.left = '';
   }
 
   // Render linked stories and docs in the right column
