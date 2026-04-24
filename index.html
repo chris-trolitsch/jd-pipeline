@@ -8809,7 +8809,7 @@ function syncInitMSAL() {
   _msalInstance = new msal.PublicClientApplication({
     auth: {
       clientId: clientId,
-      authority: 'https://login.microsoftonline.com/consumers',
+      authority: 'https://login.microsoftonline.com/common',
       redirectUri: SYNC_OD_REDIRECT
     },
     cache: { cacheLocation: 'sessionStorage', storeAuthStateInCookie: false }
