@@ -3151,10 +3151,11 @@ function saveAppChanges() {
   });
   
   // Force re-render of list to update filter visibility
-  renderList();
-  
-  // Re-select the app to update the detail view
-  selectApp(selectedApp);
+  // Skip in pop-out mode — pop-out manages its own state
+  if (!new URLSearchParams(window.location.search).get('popout')) {
+    renderList();
+    selectApp(selectedApp);
+  }
 }
 
 // Open job URL
