@@ -31,7 +31,7 @@
     --color-background-secondary: #2d2d2d;
     --color-background-info: #1a3a42;
     --color-background-success: #1a3a28;
-    --color-background-warning: #3d3520;
+    --color-background-warning: #2d2700;
     --color-background-danger: #3d1f25;
     --color-text-primary: #e0e0e0;
     --color-text-secondary: #a0a0a0;
@@ -8656,27 +8656,34 @@ function initPopoutMode() {
   const appId  = params.get('popout');
   if (!appId) return false;
 
-  // Mark body so CSS hides the main nav chrome
-  document.body.setAttribute('data-popout', '1');
-
-  // Hide main UI elements
-  ['main-nav', 'main-tabs-bar', 'main-tab-content-pipeline',
-   'main-tab-content-tasks', 'main-tab-content-contacts',
-   'main-tab-content-repo', 'main-tab-content-admin'].forEach(id => {
+  // Hide main UI: header, tabs, all tab content, hamburger, drawer
+  const hideIds = [
+    'hamburger-menu', 'admin-drawer', 'demo-mode-banner',
+    'main-tab-content-pipeline', 'main-tab-content-tasks',
+    'main-tab-content-contacts', 'main-tab-content-repo',
+    'main-tab-content-admin'
+  ];
+  hideIds.forEach(id => {
     const el = document.getElementById(id);
     if (el) el.style.display = 'none';
   });
 
-  // Also hide the sticky header if present
-  const stickyHeader = document.querySelector('.sticky-header, header, .main-header');
-  if (stickyHeader) stickyHeader.style.display = 'none';
+  // Hide the header div (dashboard title) and tab bar (no IDs — use querySelector)
+  document.querySelectorAll('.main-tab-container, .main-tab-content').forEach(el => {
+    el.style.display = 'none';
+  });
+
+  // Hide the h1 header bar — it is the first direct child div of body with margin-left:60px
+  document.querySelectorAll('body > div').forEach(el => {
+    if (el.id !== 'popout-overlay') el.style.display = 'none';
+  });
 
   // Find the app
   const app = allApplications.find(a => a.id === appId);
   if (!app) {
     document.getElementById('popout-overlay').classList.add('active');
     document.getElementById('popout-detail').innerHTML =
-      '<div style="padding:40px;text-align:center;color:var(--color-text-secondary);">Application not found. It may have been deleted.</div>';
+      '<div style="padding:40px;text-align:center;color:var(--color-text-secondary);">Application not found.</div>';
     return true;
   }
 
@@ -8684,7 +8691,7 @@ function initPopoutMode() {
   document.getElementById('popout-header-company').textContent = app.company;
   document.getElementById('popout-header-role').textContent    = app.role;
 
-  // Status badge with color
+  // Status badge with colour hierarchy
   const badge = document.getElementById('popout-status-badge');
   badge.textContent = app.status;
   if (app.status === 'Accepted Offer' || app.status === 'Offered') {
@@ -8695,75 +8702,71 @@ function initPopoutMode() {
     badge.style.cssText = 'font-size:11px;font-weight:700;padding:4px 10px;border-radius:20px;background:rgba(255,255,255,0.15);color:white;white-space:nowrap;';
   }
 
-  // Render the full editable detail view into popout-detail
-  // Temporarily show detail-view so selectApp can write into it,
-  // then transplant the result into the popout panel
+  // Render editable form: make detail-view visible off-screen, call selectApp,
+  // then move the rendered nodes into #popout-detail
   const detailView = document.getElementById('detail-view');
-  const pipelineCol = detailView ? detailView.parentElement : null;
-  if (detailView && pipelineCol) {
-    // Briefly make the container visible off-screen so selectApp renders correctly
-    pipelineCol.style.position = 'absolute';
-    pipelineCol.style.left = '-9999px';
-    pipelineCol.style.display = 'block';
+  if (detailView) {
+    // Temporarily position off-screen so selectApp renders into a live element
+    detailView.style.position = 'fixed';
+    detailView.style.left = '-9999px';
+    detailView.style.display = 'block';
     selectApp(app);
-    // Move rendered content into popout panel
     const popoutDetail = document.getElementById('popout-detail');
     while (detailView.firstChild) {
       popoutDetail.appendChild(detailView.firstChild);
     }
-    // Hide the original container again
-    pipelineCol.style.display = 'none';
-    pipelineCol.style.position = '';
-    pipelineCol.style.left = '';
+    detailView.style.position = '';
+    detailView.style.left = '';
+    detailView.style.display = 'none';
   }
 
-  // Render linked stories and docs in the right column
+  // Render linked stories and docs in right column
   const linkedStars = starStories.filter(s => s.linkedJobIds && s.linkedJobIds.includes(appId));
   const linkedDocs  = additionalDocs.filter(d => d.jobIds && d.jobIds.includes(appId));
   const supportEl   = document.getElementById('popout-support');
 
-  if (linkedStars.length > 0 || linkedDocs.length > 0) {
-    let html = '';
-    if (linkedDocs.length > 0) {
-      html += '<div style="margin-bottom:24px;"><div style="font-size:11px;font-weight:700;color:#6f42c1;text-transform:uppercase;letter-spacing:0.7px;border-left:3px solid #6f42c1;padding-left:8px;margin-bottom:12px;">Additional Documents</div>';
-      linkedDocs.forEach(d => {
-        html += '<div style="padding:12px 14px;background:var(--color-background-secondary);border-radius:6px;border-left:3px solid #6f42c1;margin-bottom:10px;font-size:13px;line-height:1.6;">';
-        if (d.type === 'link') {
-          html += '<strong>' + (d.title || '') + '</strong><br><a href="' + (d.url || '') + '" target="_blank" style="color:#0d6efd;font-size:12px;">' + (d.url || '') + '</a>';
-        } else {
-          html += '<strong>' + (d.title || '') + '</strong><div style="font-size:12px;color:var(--color-text-secondary);margin-top:6px;white-space:pre-wrap;">' + (d.content || '') + '</div>';
-        }
-        html += '</div>';
-      });
+  let html = '';
+  if (linkedDocs.length > 0) {
+    html += '<div style="margin-bottom:24px;"><div style="font-size:11px;font-weight:700;color:#6f42c1;text-transform:uppercase;letter-spacing:0.7px;border-left:3px solid #6f42c1;padding-left:8px;margin-bottom:12px;">Additional Documents</div>';
+    linkedDocs.forEach(d => {
+      html += '<div style="padding:12px 14px;background:var(--color-background-secondary);border-radius:6px;border-left:3px solid #6f42c1;margin-bottom:10px;font-size:13px;line-height:1.6;">';
+      if (d.type === 'link') {
+        html += '<strong>' + (d.title || '') + '</strong><br><a href="' + (d.url || '') + '" target="_blank" style="color:#0d6efd;font-size:12px;">' + (d.url || '') + '</a>';
+      } else {
+        html += '<strong>' + (d.title || '') + '</strong><div style="font-size:12px;color:var(--color-text-secondary);margin-top:6px;white-space:pre-wrap;">' + (d.content || '') + '</div>';
+      }
       html += '</div>';
-    }
-    if (linkedStars.length > 0) {
-      html += '<div><div style="font-size:11px;font-weight:700;color:#28a745;text-transform:uppercase;letter-spacing:0.7px;border-left:3px solid #28a745;padding-left:8px;margin-bottom:12px;">Linked Stories</div>';
-      linkedStars.forEach(s => {
-        html += '<div style="padding:12px 14px;background:var(--color-background-secondary);border-radius:6px;border-left:3px solid #28a745;margin-bottom:10px;font-size:13px;line-height:1.6;">';
-        html += '<strong>' + (s.title || '') + '</strong>';
-        if (s.description) html += '<div style="font-size:12px;color:var(--color-text-secondary);margin-top:4px;white-space:pre-wrap;">' + s.description + '</div>';
-        if (s.metrics)     html += '<div style="margin-top:8px;padding:8px 10px;background:rgba(40,167,69,0.1);border-radius:4px;border-left:3px solid #28a745;font-size:12px;white-space:pre-wrap;color:#28a745;">' + s.metrics + '</div>';
-        html += '</div>';
-      });
-      html += '</div>';
-    }
-    supportEl.innerHTML = html;
+    });
+    html += '</div>';
   }
+  if (linkedStars.length > 0) {
+    html += '<div><div style="font-size:11px;font-weight:700;color:#28a745;text-transform:uppercase;letter-spacing:0.7px;border-left:3px solid #28a745;padding-left:8px;margin-bottom:12px;">Linked Stories</div>';
+    linkedStars.forEach(s => {
+      html += '<div style="padding:12px 14px;background:var(--color-background-secondary);border-radius:6px;border-left:3px solid #28a745;margin-bottom:10px;font-size:13px;line-height:1.6;">';
+      html += '<strong>' + (s.title || '') + '</strong>';
+      if (s.description) html += '<div style="font-size:12px;color:var(--color-text-secondary);margin-top:4px;white-space:pre-wrap;">' + s.description + '</div>';
+      if (s.metrics)     html += '<div style="margin-top:8px;padding:8px 10px;background:rgba(40,167,69,0.1);border-radius:4px;border-left:3px solid #28a745;font-size:12px;white-space:pre-wrap;color:#28a745;">' + s.metrics + '</div>';
+      html += '</div>';
+    });
+    html += '</div>';
+  }
+  if (!html) {
+    html = '<div style="color:var(--color-text-secondary);font-size:13px;padding:20px 0;">No linked stories or documents.</div>';
+  }
+  supportEl.innerHTML = html;
 
-  // Activate the overlay
-  document.getElementById('popout-overlay').classList.add('active');
-
-  // Listen for title updates if status changes
+  // Update badge when status field changes
   document.addEventListener('change', function(e) {
     if (e.target && e.target.id === 'edit-status') {
       badge.textContent = e.target.value;
     }
   });
 
-  // Listen for saves from this tab to trigger sync
+  // Wire save button to also notify parent
   document.addEventListener('app-saved', notifyParentOfSave);
 
+  // Activate the overlay
+  document.getElementById('popout-overlay').classList.add('active');
   return true;
 }
 
