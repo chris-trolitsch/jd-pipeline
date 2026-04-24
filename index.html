@@ -225,6 +225,30 @@ input, select, textarea {
   color: var(--color-text-success);
 }
 
+.badge-interview {
+  background: rgba(102, 16, 242, 0.15);
+  color: #a370f7;
+  border: 1px solid rgba(102, 16, 242, 0.4);
+  font-weight: 700;
+}
+
+.badge-offered {
+  background: rgba(0, 255, 128, 0.15);
+  color: #00ff80;
+  border: 1px solid rgba(0, 255, 128, 0.5);
+  font-weight: 900;
+  text-shadow: 0 0 6px rgba(0, 255, 128, 0.6);
+}
+
+.badge-accepted {
+  background: rgba(0, 255, 128, 0.2);
+  color: #00ff80;
+  border: 1px solid rgba(0, 255, 128, 0.7);
+  font-weight: 900;
+  letter-spacing: 0.3px;
+  text-shadow: 0 0 8px rgba(0, 255, 128, 0.8);
+}
+
 /* Detail Box */
 .detail-box {
   background: var(--color-background-primary);
@@ -4419,6 +4443,35 @@ function calculatePipelineHealth(app) {
   if (app.status === 'Closed' || app.status === 'Paused') {
     return { level: 'none', color: '', glow: '' };
   }
+
+  // STATUS-PRIORITY GLOWS — override health scoring entirely
+  if (app.status === 'Accepted Offer') {
+    return {
+      level: 'accepted',
+      color: '#00ff80',
+      glow: 'box-shadow: 0 0 28px rgba(0,255,128,0.95), 0 0 8px rgba(0,255,128,0.6); border-color: rgba(0,255,128,0.8);',
+      icon: '🟢',
+      label: 'Accepted'
+    };
+  }
+  if (app.status === 'Offered') {
+    return {
+      level: 'offered',
+      color: '#00ff80',
+      glow: 'box-shadow: 0 0 24px rgba(0,255,128,0.85), 0 0 6px rgba(0,255,128,0.5); border-color: rgba(0,255,128,0.7);',
+      icon: '💚',
+      label: 'Offered'
+    };
+  }
+  if (app.status === 'Interview Stage') {
+    return {
+      level: 'interview',
+      color: '#a370f7',
+      glow: 'box-shadow: 0 0 18px rgba(102,16,242,0.7), 0 0 5px rgba(163,112,247,0.4); border-color: rgba(102,16,242,0.5);',
+      icon: '🟣',
+      label: 'Interview'
+    };
+  }
   
   // Use lastActivityDate (updated on every save) or fallback to appDate
   const lastActivity = app.lastActivityDate || app.appDate;
@@ -4558,10 +4611,12 @@ function renderList() {
       }
     }
     
-    // Apply glow effect: blue for admin-pending, green for interview, otherwise health glow
+    // Apply glow — priority: admin-pending > status glow (Accepted/Offered/Interview) > upcoming interview > health
     if (app.adminPending) {
       card.classList.add('admin-pending');
       card.style.cssText = 'box-shadow: 0 0 14px rgba(13, 110, 253, 0.75); border-color: #0d6efd;';
+    } else if (health.level === 'accepted' || health.level === 'offered' || health.level === 'interview') {
+      card.style.cssText = health.glow;
     } else if (upcomingInterview) {
       card.style.cssText = 'box-shadow: 0 0 12px rgba(40, 167, 69, 0.6);'; // Green glow
     } else if (health.glow) {
@@ -7615,7 +7670,11 @@ function renderContactApplicationHistory() {
     <div style="display: grid; gap: 12px;">
       ${historyApps.map(app => {
         const isActive = app.status !== 'Closed';
-        const statusColor = isActive ? 'var(--color-text-success)' : 'var(--color-text-secondary)';
+        const statusColor = app.status === 'Accepted Offer' ? '#00ff80'
+          : app.status === 'Offered' ? '#00ff80'
+          : app.status === 'Interview Stage' ? '#a370f7'
+          : isActive ? 'var(--color-text-success)' : 'var(--color-text-secondary)';
+        const statusWeight = (app.status === 'Accepted Offer' || app.status === 'Offered') ? '900' : '500';
         
         return `
           <div class="app-card" onclick="viewApplicationFromContact('${app.id}')" style="cursor: pointer; ${!isActive ? 'opacity: 0.6;' : ''}">
@@ -7627,7 +7686,7 @@ function renderContactApplicationHistory() {
             </div>
             <div style="font-size: 12px; color: var(--color-text-secondary); margin-bottom: 8px;">${dm(app.role, 'role')}</div>
             <div style="display: flex; justify-content: space-between; align-items: center; font-size: 11px;">
-              <div style="color: ${statusColor}; font-weight: 500;">${app.status}</div>
+              <div style="color: ${statusColor}; font-weight: ${statusWeight};">${app.status}</div>
               <div style="color: var(--color-text-secondary);">Applied: ${app.appDate}</div>
             </div>
             ${app.confidenceScore ? `<div style="font-size: 10px; color: var(--color-text-warning); margin-top: 4px;">⭐ ${app.confidenceScore}/10</div>` : ''}
@@ -8627,9 +8686,15 @@ function openAppInNewTab(appId) {
     + '@media (max-width: 700px) { .body { grid-template-columns: 1fr; } }'
     + '<' + '/style>';
 
+  const statusBadgeColor = app.status === 'Accepted Offer' || app.status === 'Offered'
+    ? 'background:rgba(0,255,128,0.15);color:#00cc66;border:1px solid rgba(0,255,128,0.5);font-weight:900;'
+    : app.status === 'Interview Stage'
+    ? 'background:rgba(102,16,242,0.15);color:#a370f7;border:1px solid rgba(102,16,242,0.4);font-weight:700;'
+    : '';
+
   const header = '<div class="header">'
     + '<div><div class="header h1">' + esc(app.company) + '</div><div class="meta">' + esc(app.role) + '</div></div>'
-    + '<span class="badge">' + esc(app.status) + '</span>'
+    + '<span class="badge" style="' + statusBadgeColor + '">' + esc(app.status) + '</span>'
     + '</div>';
 
   const body = '<div class="body">'
