@@ -3137,9 +3137,6 @@ function saveAppChanges() {
   // Cloud sync auto-save
   syncAutoSave();
 
-  // Notify pop-out listeners
-  document.dispatchEvent(new CustomEvent('app-saved'));
-
   const statusDiv = document.getElementById('app-save-status');
   if (statusDiv) {
     statusDiv.textContent = '✓ Changes saved';
@@ -3151,13 +3148,18 @@ function saveAppChanges() {
     const el = document.getElementById(id);
     if (el) el.textContent = lastSavedStr;
   });
-  
-  // Force re-render of list to update filter visibility
-  // Skip in pop-out mode — pop-out manages its own state
-  if (!new URLSearchParams(window.location.search).get('popout')) {
-    renderList();
-    selectApp(selectedApp);
+
+  // Pop-out mode: notify parent then reload to reset form state cleanly
+  if (new URLSearchParams(window.location.search).get('popout')) {
+    notifyParentOfSave();
+    sessionStorage.setItem('popout-scroll', window.scrollY);
+    window.location.reload();
+    return;
   }
+
+  // Main window: re-render list and detail panel
+  renderList();
+  selectApp(selectedApp);
 }
 
 // Open job URL
@@ -8759,15 +8761,19 @@ function initPopoutMode() {
   }
   supportEl.innerHTML = html;
 
+  // Restore scroll position after reload
+  const savedScroll = sessionStorage.getItem('popout-scroll');
+  if (savedScroll) {
+    window.scrollTo(0, parseInt(savedScroll));
+    sessionStorage.removeItem('popout-scroll');
+  }
+
   // Update badge when status field changes
   document.addEventListener('change', function(e) {
     if (e.target && e.target.id === 'edit-status') {
       badge.textContent = e.target.value;
     }
   });
-
-  // Wire save button to also notify parent
-  document.addEventListener('app-saved', notifyParentOfSave);
 
   // Activate the overlay
   document.getElementById('popout-overlay').classList.add('active');
