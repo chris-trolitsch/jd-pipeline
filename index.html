@@ -5,6 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Chris Trolitsch Job Pipeline Dashboard v6</title>
 <script src="https://accounts.google.com/gsi/client" async defer></script>
+<script src="https://alcdn.msauth.net/browser/2.38.3/js/msal-browser.min.js" async defer></script>
 <style>
 :root {
   --color-background-primary: #ffffff;
@@ -898,6 +899,13 @@ input, select, textarea {
                   style="width: 100%; padding: 5px 7px; border: 1px solid var(--color-border-primary); border-radius: 4px; font-size: 11px; font-family: monospace; background: var(--color-background-primary); color: var(--color-text-primary);">
               </div>
 
+              <!-- OneDrive Client ID — always visible when OneDrive selected -->
+              <div id="sync-onedrive-client-id-row" style="display: none; margin-bottom: 10px;">
+                <label style="font-size: 11px; font-weight: 600; display: block; margin-bottom: 3px; color: var(--color-text-primary);">Azure Application (Client) ID</label>
+                <input type="text" id="sync-onedrive-client-id" placeholder="xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx"
+                  style="width: 100%; padding: 5px 7px; border: 1px solid var(--color-border-primary); border-radius: 4px; font-size: 11px; font-family: monospace; background: var(--color-background-primary); color: var(--color-text-primary);">
+              </div>
+
               <!-- Status bar -->
               <div id="sync-status-bar" style="display: flex; align-items: center; gap: 8px; padding: 8px 10px; background: var(--color-background-primary); border-radius: 6px; border: 1px solid var(--color-border-primary); margin-bottom: 8px; font-size: 12px;">
                 <div id="sync-status-dot" style="width: 9px; height: 9px; border-radius: 50%; background: #aaa; flex-shrink: 0;"></div>
@@ -936,9 +944,21 @@ input, select, textarea {
               </div>
             </div>
 
-            <div id="sync-instructions-onedrive" style="display: none; margin-top: 8px; padding: 12px 14px; background: #1a1a2e; border-radius: 6px; border: 1px solid #0d6efd; font-size: 11px; line-height: 1.8; color: #e0e0e0;">
-              <div style="font-size: 10px; font-weight: 700; color: #74b9ff; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 6px;">OneDrive — Coming in Phase 2</div>
-              <p style="margin: 0; color: #a0a0a0;">OneDrive sync via Microsoft Graph API is planned for the next phase. Google Drive is available now.</p>
+            <div id="sync-instructions-onedrive" style="display: none; margin-top: 8px; padding: 12px 14px; background: #1a1a2e; border-radius: 6px; border: 1px solid #0078d4; font-size: 11px; line-height: 1.8; color: #e0e0e0; max-height: 260px; overflow-y: auto;">
+              <div style="font-size: 10px; font-weight: 700; color: #74b9ff; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 8px;">OneDrive Setup — One Time</div>
+              <ol style="padding-left: 18px; margin: 0; color: #e0e0e0;">
+                <li style="margin-bottom: 6px;">Go to <strong style="color: #fff;">portal.azure.com</strong> and sign in with your Microsoft account.</li>
+                <li style="margin-bottom: 6px;">Search for <strong style="color: #fff;">App registrations</strong> and click <strong style="color: #fff;">New registration</strong>.</li>
+                <li style="margin-bottom: 6px;">Name it <em style="color: #fff;">JD Pipeline</em>. Under Supported account types select <strong style="color: #fff;">Personal Microsoft accounts only</strong>. Leave redirect URI blank for now. Click <strong style="color: #fff;">Register</strong>.</li>
+                <li style="margin-bottom: 6px;">Copy the <strong style="color: #fff;">Application (client) ID</strong> from the overview screen and paste it in the field above.</li>
+                <li style="margin-bottom: 6px;">In the left menu click <strong style="color: #fff;">Authentication</strong>. Under Platform configurations click <strong style="color: #fff;">Add a platform</strong> and select <strong style="color: #fff;">Single-page application</strong>. Set the redirect URI to: <code style="background: #2d2d2d; padding: 1px 5px; border-radius: 3px;">https://chris-trolitsch.github.io/jd-pipeline/</code>. Click <strong style="color: #fff;">Configure</strong>.</li>
+                <li style="margin-bottom: 6px;">Still under Authentication, scroll to <strong style="color: #fff;">Advanced settings</strong> and enable <strong style="color: #fff;">Allow public client flows</strong>. Click <strong style="color: #fff;">Save</strong>.</li>
+                <li style="margin-bottom: 6px;">Click <strong style="color: #fff;">Save Profile</strong> in the dashboard, then click <strong style="color: #fff;">Connect OneDrive</strong>. A Microsoft popup will ask for sign-in and Files permission.</li>
+                <li>On first sync, <code style="background: #2d2d2d; padding: 1px 5px; border-radius: 3px;">jd-pipeline.json</code> is created in your OneDrive root.</li>
+              </ol>
+              <div style="margin-top: 10px; padding: 8px 10px; background: #1a2a3a; border-radius: 4px; border-left: 3px solid #0078d4; font-size: 10px; color: #90c8f0;">
+                <strong>Note:</strong> The redirect URI must exactly match your GitHub Pages URL including the trailing slash. MSAL handles the popup flow — no server-side code is required.
+              </div>
             </div>
           </div>
         </div>
@@ -2876,7 +2896,8 @@ let profileData = {
   jdPath: '',
   syncProvider: 'none',
   syncFilename: 'jd-pipeline.json',
-  syncGoogleClientId: ''
+  syncGoogleClientId: '',
+  syncOneDriveClientId: ''
 };
 
 // Demo Mode globals - declared here so all functions can access them safely
@@ -4126,8 +4147,10 @@ function saveProfile() {
   // Sync settings
   const filenameEl = document.getElementById('sync-filename');
   const googleCidEl = document.getElementById('sync-google-client-id');
+  const odCidEl = document.getElementById('sync-onedrive-client-id');
   if (filenameEl) profileData.syncFilename = filenameEl.value.trim() || 'jd-pipeline.json';
   if (googleCidEl) profileData.syncGoogleClientId = googleCidEl.value.trim();
+  if (odCidEl) profileData.syncOneDriveClientId = odCidEl.value.trim();
   
   localStorage.setItem('profile-data', JSON.stringify(profileData));
   
@@ -4187,12 +4210,13 @@ function loadProfile() {
     // Restore sync UI state
     const filenameEl = document.getElementById('sync-filename');
     const googleCidEl = document.getElementById('sync-google-client-id');
+    const odCidEl = document.getElementById('sync-onedrive-client-id');
     if (filenameEl) filenameEl.value = profileData.syncFilename || 'jd-pipeline.json';
-    // Restore provider first so the Client ID row is visible before populating it
     if (profileData.syncProvider && profileData.syncProvider !== 'none') {
       selectSyncProvider(profileData.syncProvider);
     }
     if (googleCidEl) googleCidEl.value = profileData.syncGoogleClientId || '';
+    if (odCidEl) odCidEl.value = profileData.syncOneDriveClientId || '';
     
     // Update dashboard title with loaded name
     updateDashboardTitle();
@@ -8629,53 +8653,6 @@ function openAppInNewTab(appId) {
 // ============================================================================
 // CLOUD SYNC UI (Visual Only — provider logic not yet active)
 // ============================================================================
-function selectSyncProvider(provider) {
-  // Update card highlight
-  ['none','google','onedrive'].forEach(p => {
-    const el = document.getElementById('sync-option-'+p);
-    if (!el) return;
-    if (p === provider) {
-      el.style.background = '#0d6efd';
-      el.style.color = 'white';
-      el.style.borderColor = '#0d6efd';
-    } else {
-      el.style.background = 'var(--color-background-primary)';
-      el.style.color = 'var(--color-text-primary)';
-      el.style.borderColor = 'var(--color-border-primary)';
-    }
-    // Fix sub-label color
-    const sub = el.querySelector('div:last-child');
-    if (sub) sub.style.opacity = p === provider ? '0.85' : '1';
-  });
-
-  // Show/hide status bar and instructions
-  const bar = document.getElementById('sync-status-bar');
-  const googleInstr = document.getElementById('sync-instructions-google');
-  const onedriveInstr = document.getElementById('sync-instructions-onedrive');
-
-  if (provider === 'none') {
-    bar.style.display = 'none';
-    googleInstr.style.display = 'none';
-    onedriveInstr.style.display = 'none';
-  } else {
-    bar.style.display = 'flex';
-    if (provider === 'google') {
-      googleInstr.style.display = 'block';
-      onedriveInstr.style.display = 'none';
-      document.getElementById('sync-connect-btn').textContent = 'Connect Google';
-    } else {
-      googleInstr.style.display = 'none';
-      onedriveInstr.style.display = 'block';
-      document.getElementById('sync-connect-btn').textContent = 'Connect Microsoft';
-    }
-    document.getElementById('sync-status-dot').style.background = '#aaa';
-    document.getElementById('sync-status-text').textContent = 'Not connected — complete setup below and click Connect';
-  }
-
-  // Persist selection (for future active implementation)
-  if (profileData) profileData.syncProvider = provider;
-}
-
 // ============================================================================
 // CLOUD SYNC — GOOGLE DRIVE (Phase 1)
 // Uses Google Identity Services (GIS) token model.
@@ -8775,19 +8752,246 @@ function syncHandleToken(response) {
   syncLoad();
 }
 
-// ── Connect Entry Point ───────────────────────────────────────────────────────
+// ── Connect Entry Point (branched by provider) ────────────────────────────────
 
 function syncConnect() {
-  if (_syncProvider !== 'google') {
-    alert('Select Google Drive as your provider first.');
-    return;
+  if (_syncProvider === 'google') {
+    if (!syncInitGoogleClient()) return;
+    syncSetStatus('#f39c12', 'Waiting for Google sign-in...', 'Connect Google', false);
+    _syncClient.requestAccessToken();
+  } else if (_syncProvider === 'onedrive') {
+    syncConnectOneDrive();
+  } else {
+    alert('Select a cloud provider first.');
   }
-  if (!syncInitGoogleClient()) return;
-  syncSetStatus('#f39c12', 'Waiting for Google sign-in...', 'Connect Google', false);
-  _syncClient.requestAccessToken();
 }
 
-// ── Assemble Full Payload ─────────────────────────────────────────────────────
+// ── Auto-save hook ────────────────────────────────────────────────────────────
+
+function syncAutoSave() {
+  if (_syncProvider === 'google' && _syncToken) {
+    syncSave(false);
+  } else if (_syncProvider === 'onedrive' && _odToken) {
+    syncODSave(false);
+  }
+}
+
+// ============================================================================
+// CLOUD SYNC — ONEDRIVE (Phase 2)
+// Uses MSAL.js popup flow (SPA mode).
+// Redirect URI must be registered in Azure as a SPA redirect.
+// Works from GitHub Pages or any https:// host.
+// ============================================================================
+
+const SYNC_OD_SCOPE    = ['Files.ReadWrite', 'User.Read'];
+const SYNC_OD_GRAPH    = 'https://graph.microsoft.com/v1.0';
+const SYNC_OD_REDIRECT = 'https://chris-trolitsch.github.io/jd-pipeline/';
+
+let _odToken     = null;   // current OneDrive access token (memory only)
+let _odFileId    = null;   // OneDrive item ID once located/created
+let _msalInstance = null;  // MSAL PublicClientApplication instance
+
+function syncODGetClientId() {
+  return (profileData && profileData.syncOneDriveClientId)
+    ? profileData.syncOneDriveClientId.trim() : '';
+}
+
+function syncInitMSAL() {
+  const clientId = syncODGetClientId();
+  if (!clientId) {
+    alert('Paste your Azure Application (Client) ID in the field above first, then click Connect OneDrive.');
+    return false;
+  }
+  if (typeof msal === 'undefined') {
+    alert('MSAL library did not load. Check your internet connection and reload the page.');
+    return false;
+  }
+  _msalInstance = new msal.PublicClientApplication({
+    auth: {
+      clientId: clientId,
+      authority: 'https://login.microsoftonline.com/consumers',
+      redirectUri: SYNC_OD_REDIRECT
+    },
+    cache: { cacheLocation: 'sessionStorage', storeAuthStateInCookie: false }
+  });
+  return true;
+}
+
+async function syncConnectOneDrive() {
+  if (!syncInitMSAL()) return;
+  syncSetStatus('#f39c12', 'Waiting for Microsoft sign-in...', 'Connect OneDrive', false);
+  try {
+    const result = await _msalInstance.loginPopup({ scopes: SYNC_OD_SCOPE });
+    if (!result || !result.account) throw new Error('No account returned');
+    // Get access token for Graph API
+    const tokenResult = await _msalInstance.acquireTokenSilent({
+      scopes: SYNC_OD_SCOPE,
+      account: result.account
+    });
+    _odToken = tokenResult.accessToken;
+    syncSetStatus('#27ae60', 'Connected to OneDrive — token active', 'Reconnect', true);
+    syncSetBadge('Connected', '#d4edda', '#155724');
+    syncRestoreLastTime();
+    // Auto-load on connect
+    await syncODLoad();
+  } catch (err) {
+    console.error('MSAL login error:', err);
+    // Fallback to popup if silent fails
+    if (err instanceof msal.InteractionRequiredAuthError || err.name === 'InteractionRequiredAuthError') {
+      try {
+        const tokenResult = await _msalInstance.acquireTokenPopup({ scopes: SYNC_OD_SCOPE });
+        _odToken = tokenResult.accessToken;
+        syncSetStatus('#27ae60', 'Connected to OneDrive', 'Reconnect', true);
+        syncSetBadge('Connected', '#d4edda', '#155724');
+        syncRestoreLastTime();
+        await syncODLoad();
+      } catch (err2) {
+        syncSetStatus('#e74c3c', 'OneDrive auth failed: ' + err2.message, 'Connect OneDrive', false);
+        syncSetBadge('Auth Failed', '#f8d7da', '#721c24');
+      }
+    } else {
+      syncSetStatus('#e74c3c', 'OneDrive auth failed: ' + err.message, 'Connect OneDrive', false);
+      syncSetBadge('Auth Failed', '#f8d7da', '#721c24');
+    }
+  }
+}
+
+async function syncODFindOrCreateFile() {
+  const filename = syncGetFilename();
+  // Search OneDrive root for file by name
+  const searchRes = await fetch(
+    SYNC_OD_GRAPH + `/me/drive/root:/${filename}`,
+    { headers: { Authorization: 'Bearer ' + _odToken } }
+  );
+  if (searchRes.ok) {
+    const data = await searchRes.json();
+    _odFileId = data.id;
+    return 'found';
+  }
+  if (searchRes.status === 404) {
+    // File does not exist — create empty placeholder
+    const createRes = await fetch(
+      SYNC_OD_GRAPH + `/me/drive/root:/${filename}:/content`,
+      {
+        method: 'PUT',
+        headers: {
+          Authorization: 'Bearer ' + _odToken,
+          'Content-Type': 'application/json'
+        },
+        body: '{}'
+      }
+    );
+    if (!createRes.ok) throw new Error('OneDrive create failed: ' + createRes.status);
+    const createData = await createRes.json();
+    _odFileId = createData.id;
+    return 'created';
+  }
+  throw new Error('OneDrive search failed: ' + searchRes.status);
+}
+
+async function syncODSave(manual) {
+  if (!_odToken) {
+    if (manual) alert('Not connected to OneDrive. Click Connect OneDrive first.');
+    return;
+  }
+  try {
+    syncSetStatus('#f39c12', 'Saving to OneDrive...', 'Reconnect', false);
+    if (!_odFileId) await syncODFindOrCreateFile();
+    const filename = syncGetFilename();
+    const payload = syncBuildPayload();
+    const res = await fetch(
+      SYNC_OD_GRAPH + `/me/drive/root:/${filename}:/content`,
+      {
+        method: 'PUT',
+        headers: {
+          Authorization: 'Bearer ' + _odToken,
+          'Content-Type': 'application/json'
+        },
+        body: payload
+      }
+    );
+    if (!res.ok) throw new Error('OneDrive upload failed: ' + res.status);
+    syncSetStatus('#27ae60', 'Saved to OneDrive', 'Reconnect', true);
+    syncRecordTime();
+    if (manual) {
+      const statusDiv = document.getElementById('profile-save-status');
+      if (statusDiv) { statusDiv.textContent = '☁️ Synced to OneDrive'; setTimeout(() => statusDiv.textContent = '', 2500); }
+    }
+  } catch (err) {
+    console.error('syncODSave error:', err);
+    syncSetStatus('#e74c3c', 'OneDrive save failed — ' + err.message, 'Reconnect', true);
+    syncSetBadge('Sync Error', '#f8d7da', '#721c24');
+    if (manual) alert('OneDrive save failed: ' + err.message);
+  }
+}
+
+async function syncODLoad() {
+  if (!_odToken) return;
+  try {
+    syncSetStatus('#f39c12', 'Loading from OneDrive...', 'Reconnect', false);
+    const status = await syncODFindOrCreateFile();
+    if (status === 'created') {
+      syncSetStatus('#27ae60', 'New file created — pushing local data to OneDrive', 'Reconnect', true);
+      await syncODSave(false);
+      return;
+    }
+    // Pull content
+    const filename = syncGetFilename();
+    const res = await fetch(
+      SYNC_OD_GRAPH + `/me/drive/root:/${filename}:/content`,
+      { headers: { Authorization: 'Bearer ' + _odToken } }
+    );
+    if (!res.ok) throw new Error('OneDrive download failed: ' + res.status);
+
+    let data;
+    try { data = await res.json(); } catch(e) { data = null; }
+
+    const localCount = allApplications.length;
+    const driveCount = (data && Array.isArray(data.applications)) ? data.applications.length : 0;
+
+    if (driveCount > localCount) {
+      const confirmed = confirm(
+        'OneDrive has ' + driveCount + ' applications, local has ' + localCount + '.\n\n' +
+        'Load OneDrive data? Your local session will be updated to match OneDrive.'
+      );
+      if (confirmed) {
+        allApplications = data.applications;
+        if (Array.isArray(data.contacts))        warmLeadsContacts = data.contacts;
+        if (Array.isArray(data.starStories))     starStories = data.starStories;
+        if (Array.isArray(data.governanceItems)) governanceItems = data.governanceItems;
+        if (Array.isArray(data.additionalDocs))  additionalDocs = data.additionalDocs;
+        if (Array.isArray(data.interviewPrep))   interviewPrep = data.interviewPrep;
+        localStorage.setItem('pipeline-data',    JSON.stringify(allApplications));
+        localStorage.setItem('contacts-data',    JSON.stringify(warmLeadsContacts));
+        localStorage.setItem('star-stories',     JSON.stringify(starStories));
+        localStorage.setItem('governance-items', JSON.stringify(governanceItems));
+        localStorage.setItem('additional-docs',  JSON.stringify(additionalDocs));
+        localStorage.setItem('interview-prep',   JSON.stringify(interviewPrep));
+        renderList();
+        calculateConversionMetrics();
+        syncSetStatus('#27ae60', 'Loaded from OneDrive — data up to date', 'Reconnect', true);
+        syncSetBadge('Synced', '#d4edda', '#155724');
+        syncRecordTime();
+      } else {
+        syncSetStatus('#27ae60', 'Keeping local data — pushing to OneDrive', 'Reconnect', true);
+        await syncODSave(false);
+      }
+    } else {
+      syncSetStatus('#27ae60', 'Local data is current — pushing to OneDrive', 'Reconnect', true);
+      await syncODSave(false);
+    }
+  } catch (err) {
+    console.error('syncODLoad error:', err);
+    syncSetStatus('#e74c3c', 'OneDrive load failed — ' + err.message, 'Reconnect', true);
+    syncSetBadge('Sync Error', '#f8d7da', '#721c24');
+  }
+}
+
+// ============================================================================
+// END CLOUD SYNC
+// ============================================================================
+
+</script>
 
 function syncBuildPayload() {
   return JSON.stringify({
@@ -8975,11 +9179,12 @@ function selectSyncProvider(provider) {
     if (sub) sub.style.opacity = p === provider ? '0.85' : '1';
   });
 
-  const configFields   = document.getElementById('sync-config-fields');
-  const googleClientRow= document.getElementById('sync-google-client-id-row');
-  const googleInstr    = document.getElementById('sync-instructions-google');
-  const onedriveInstr  = document.getElementById('sync-instructions-onedrive');
-  const setupBtn       = document.getElementById('sync-setup-btn');
+  const configFields    = document.getElementById('sync-config-fields');
+  const googleClientRow = document.getElementById('sync-google-client-id-row');
+  const odClientRow     = document.getElementById('sync-onedrive-client-id-row');
+  const googleInstr     = document.getElementById('sync-instructions-google');
+  const onedriveInstr   = document.getElementById('sync-instructions-onedrive');
+  const setupBtn        = document.getElementById('sync-setup-btn');
 
   // Always collapse instructions when switching provider
   if (googleInstr)   googleInstr.style.display = 'none';
@@ -8989,17 +9194,22 @@ function selectSyncProvider(provider) {
   if (provider === 'none') {
     if (configFields)    configFields.style.display = 'none';
     if (googleClientRow) googleClientRow.style.display = 'none';
+    if (odClientRow)     odClientRow.style.display = 'none';
     syncSetBadge('Not Connected', '#fff3cd', '#856404');
     _syncToken = null;
     _syncFileId = null;
+    _odToken = null;
+    _odFileId = null;
   } else {
     if (configFields) configFields.style.display = 'block';
     if (provider === 'google') {
       if (googleClientRow) googleClientRow.style.display = 'block';
+      if (odClientRow)     odClientRow.style.display = 'none';
       syncSetStatus('#aaa', 'Not connected — enter Client ID and click Connect', 'Connect Google', false);
     } else {
       if (googleClientRow) googleClientRow.style.display = 'none';
-      syncSetStatus('#aaa', 'OneDrive coming in Phase 2', 'Phase 2', false);
+      if (odClientRow)     odClientRow.style.display = 'block';
+      syncSetStatus('#aaa', 'Not connected — enter Client ID and click Connect', 'Connect OneDrive', false);
     }
     syncSetBadge('Not Connected', '#fff3cd', '#856404');
     syncRestoreLastTime();
@@ -9008,16 +9218,8 @@ function selectSyncProvider(provider) {
   if (profileData) profileData.syncProvider = provider;
 }
 
-// ── Auto-save hook (called from saveAppChanges and other save points) ─────────
-
-function syncAutoSave() {
-  if (_syncProvider === 'google' && _syncToken) {
-    syncSave(false);
-  }
-}
-
 // ============================================================================
-// END CLOUD SYNC
+// END CLOUD SYNC — GOOGLE (old marker removed, see new END block above)
 // ============================================================================
 
 </script>
