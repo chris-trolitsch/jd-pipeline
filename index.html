@@ -825,7 +825,9 @@ input, select, textarea {
     <!-- Profile Tab -->
     <div id="repo-tab-profile" class="tab-content active">
       <div class="detail-box" style="max-width: 860px;">
-        <h3 style="margin-bottom: 1.25rem;">Profile Settings</h3>
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.25rem;">
+          <h3 style="margin: 0;">Profile Settings</h3>
+        </div>
 
         <!-- ── ROW 1: Identity + Cloud Sync side by side ──────────────── -->
         <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 1.5rem;">
@@ -848,10 +850,15 @@ input, select, textarea {
               </div>
             </div>
 
-            <div class="form-group" style="margin-bottom: 0;">
+            <div class="form-group">
               <label class="form-label">Story Framework Label</label>
               <input id="profile-story-type" type="text" class="form-control" placeholder="STAR" value="STAR">
               <div style="font-size: 11px; color: var(--color-text-secondary); margin-top: 4px;">e.g., STAR, SOAR, CAR, PAR. Default: STAR</div>
+            </div>
+
+            <div style="display: flex; align-items: center; gap: 10px; margin-top: 12px;">
+              <button onclick="saveProfile()" style="padding: 7px 22px; background: #0d6efd; color: white; border: none; border-radius: 5px; font-size: 13px; font-weight: 600; cursor: pointer;">Save Profile</button>
+              <div id="profile-save-status" style="font-size: 12px; color: var(--color-text-success);"></div>
             </div>
           </div>
 
@@ -1041,8 +1048,6 @@ input, select, textarea {
           </div>
         </div>
 
-        <button onclick="saveProfile()" style="width: 100%; max-width: 200px;">Save Profile</button>
-        <div id="profile-save-status" style="font-size: 12px; margin-top: 8px; color: var(--color-text-success);"></div>
 
         <!-- Feature Unlock -->
         <div style="margin-top: 2rem; padding: 14px 16px; background: var(--color-background-secondary); border-radius: 8px; border-left: 3px solid #f39c12;">
@@ -1111,9 +1116,13 @@ input, select, textarea {
                   <option value="onsite">On-site acceptable</option>
                 </select>
               </div>
-              <div class="form-group" style="margin-bottom: 0;">
+              <div class="form-group">
                 <label class="form-label">Core Strengths (one per line)</label>
                 <textarea id="jai-strengths" class="form-control" style="min-height: 72px; font-size: 12px;" placeholder="Enterprise cutover leadership&#10;ServiceNow ITSM platform ownership&#10;Financial services governance"></textarea>
+              </div>
+              <div class="form-group" style="margin-bottom: 0;">
+                <label class="form-label">Career Track</label>
+                <textarea id="jai-careertrack" class="form-control" style="min-height: 64px; font-size: 12px; resize: vertical;" placeholder="Describe the candidate's career track and what roles to skip. e.g.: This candidate is on the COO delivery track — Platform Implementation Delivery. Skip any role that is primarily IT infrastructure operations, cybersecurity leadership, IT strategy formulation, or business continuity regardless of compensation."></textarea>
               </div>
             </div>
 
@@ -1127,20 +1136,15 @@ input, select, textarea {
                   <button onclick="restoreSkipRules()" style="padding: 2px 8px; font-size: 11px; background: var(--color-background-warning); color: var(--color-text-warning); border: 1px solid var(--color-text-warning); border-radius: 4px; cursor: pointer;">Restore</button>
                 </div>
               </div>
-              <div style="font-size: 11px; color: var(--color-text-secondary); margin-bottom: 8px;">Personal skip rules injected into every generated prompt. Independently saved. Click a chip to remove.</div>
-              <div id="jai-skiprules-status" style="font-size: 11px; color: var(--color-text-success); min-height: 14px; margin-bottom: 6px;"></div>
-              <div id="jai-skiprules-chips" style="display: flex; flex-wrap: wrap; gap: 5px; min-height: 28px; margin-bottom: 8px;"></div>
-              <div style="display: flex; gap: 6px;">
-                <input type="text" id="jai-skiprule-input" class="form-control" style="flex: 1; font-size: 12px;" placeholder="Add a rule and press Enter..." onkeydown="if(event.key==='Enter'){addSkipRule();}">
-                <button onclick="addSkipRule()" style="padding: 4px 10px; font-size: 11px; background: #e74c3c; color: white; border: none; border-radius: 4px; cursor: pointer; white-space: nowrap;">+ Add</button>
-              </div>
-              <input type="hidden" id="jai-skiprules-data" value="[]">
+              <div style="font-size: 11px; color: var(--color-text-secondary); margin-bottom: 8px;">One rule per line. Injected into every generated prompt. Independently saved.</div>
+              <div id="jai-skiprules-status" style="font-size: 11px; color: var(--color-text-success); min-height: 14px; margin-bottom: 4px;"></div>
+              <textarea id="jai-skiprules" class="form-control" style="min-height: 140px; font-size: 12px; resize: vertical;" placeholder="No salary listed&#10;Salary below compensation floor&#10;Management consulting strategy firms&#10;PROSCI certification required&#10;Product Management roles&#10;Contract rate below floor"></textarea>
               <input type="file" id="jai-skiprules-file" accept=".json" style="display:none;" onchange="handleSkipRulesFile(event)">
             </div>
 
           </div>
 
-          <!-- COLUMN 2: Governance Rules + Analysis Steps -->
+          <!-- COLUMN 2: Governance + Scoring Thresholds + ATS Scoring + Analysis Steps -->
           <div style="display: flex; flex-direction: column; gap: 14px;">
 
             <!-- Governance Rules for Prompt -->
@@ -1153,10 +1157,42 @@ input, select, textarea {
                   <button onclick="restoreGovRules()" style="padding: 2px 8px; font-size: 11px; background: var(--color-background-warning); color: var(--color-text-warning); border: 1px solid var(--color-text-warning); border-radius: 4px; cursor: pointer;">Restore</button>
                 </div>
               </div>
-              <div style="font-size: 11px; color: var(--color-text-secondary); margin-bottom: 8px;">Your proprietary governance frameworks injected verbatim into the prompt. Use for Three-Pillar, scoring models, or any methodology the AI must reference. Independently saved.</div>
+              <div style="font-size: 11px; color: var(--color-text-secondary); margin-bottom: 8px;">Your proprietary governance frameworks injected verbatim into the prompt. Three-Pillar, methodology rules, anything the AI must apply consistently. Independently saved.</div>
               <div id="jai-govrules-status" style="font-size: 11px; color: var(--color-text-success); min-height: 14px; margin-bottom: 6px;"></div>
-              <textarea id="jai-govrules" class="form-control" style="min-height: 180px; font-size: 12px; resize: vertical;" placeholder="Three-Pillar Governance Framework:&#10;- Pillar 1: Vendor Accountability and Peer Review&#10;- Pillar 2: Outcome-Based KPIs&#10;- Pillar 3: Strategic Translation&#10;&#10;Add any proprietary frameworks, scoring models, or rules the AI should apply during analysis."></textarea>
+              <textarea id="jai-govrules" class="form-control" style="min-height: 120px; font-size: 12px; resize: vertical;" placeholder="Three-Pillar Governance Framework:&#10;- Pillar 1: Vendor Accountability and Peer Review&#10;- Pillar 2: Outcome-Based KPIs&#10;- Pillar 3: Strategic Translation"></textarea>
               <input type="file" id="jai-govrules-file" accept=".json" style="display:none;" onchange="handleGovRulesFile(event)">
+            </div>
+
+            <!-- Scoring Thresholds -->
+            <div style="padding: 14px 16px; background: var(--color-background-secondary); border-radius: 8px; border-left: 3px solid #e67e22;">
+              <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px;">
+                <div style="font-size: 12px; font-weight: 700; color: #e67e22; text-transform: uppercase; letter-spacing: 0.6px;">Scoring Thresholds</div>
+                <div style="display: flex; gap: 5px;">
+                  <button onclick="saveScoringThresholds()" style="padding: 2px 8px; font-size: 11px; background: var(--color-background-success); color: var(--color-text-success); border: 1px solid var(--color-text-success); border-radius: 4px; cursor: pointer;">Save</button>
+                  <button onclick="backupScoringThresholds()" style="padding: 2px 8px; font-size: 11px; background: var(--color-background-secondary); color: var(--color-text-secondary); border: 1px solid var(--color-border-primary); border-radius: 4px; cursor: pointer;">Backup</button>
+                  <button onclick="restoreScoringThresholds()" style="padding: 2px 8px; font-size: 11px; background: var(--color-background-warning); color: var(--color-text-warning); border: 1px solid var(--color-text-warning); border-radius: 4px; cursor: pointer;">Restore</button>
+                </div>
+              </div>
+              <div style="font-size: 11px; color: var(--color-text-secondary); margin-bottom: 8px;">Confidence scoring scale and minimum APPLY threshold. Injected into the Governance section of the prompt. Edit freely — these are your benchmarks.</div>
+              <div id="jai-scoring-status" style="font-size: 11px; color: var(--color-text-success); min-height: 14px; margin-bottom: 6px;"></div>
+              <textarea id="jai-scoring" class="form-control" style="min-height: 130px; font-size: 12px; resize: vertical;"></textarea>
+              <input type="file" id="jai-scoring-file" accept=".json" style="display:none;" onchange="handleScoringThresholdsFile(event)">
+            </div>
+
+            <!-- ATS/iCIMS Scoring Weights -->
+            <div style="padding: 14px 16px; background: var(--color-background-secondary); border-radius: 8px; border-left: 3px solid #2980b9;">
+              <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px;">
+                <div style="font-size: 12px; font-weight: 700; color: #2980b9; text-transform: uppercase; letter-spacing: 0.6px;">ATS / iCIMS Scoring Weights</div>
+                <div style="display: flex; gap: 5px;">
+                  <button onclick="saveATSWeights()" style="padding: 2px 8px; font-size: 11px; background: var(--color-background-success); color: var(--color-text-success); border: 1px solid var(--color-text-success); border-radius: 4px; cursor: pointer;">Save</button>
+                  <button onclick="backupATSWeights()" style="padding: 2px 8px; font-size: 11px; background: var(--color-background-secondary); color: var(--color-text-secondary); border: 1px solid var(--color-border-primary); border-radius: 4px; cursor: pointer;">Backup</button>
+                  <button onclick="restoreATSWeights()" style="padding: 2px 8px; font-size: 11px; background: var(--color-background-warning); color: var(--color-text-warning); border: 1px solid var(--color-text-warning); border-radius: 4px; cursor: pointer;">Restore</button>
+                </div>
+              </div>
+              <div style="font-size: 11px; color: var(--color-text-secondary); margin-bottom: 8px;">Recommended scoring weights based on proven experience. Injected into the Governance section. Adjust point allocations to reflect your own assessment model.</div>
+              <div id="jai-ats-status" style="font-size: 11px; color: var(--color-text-success); min-height: 14px; margin-bottom: 6px;"></div>
+              <textarea id="jai-atsweights" class="form-control" style="min-height: 160px; font-size: 12px; resize: vertical;"></textarea>
+              <input type="file" id="jai-atsweights-file" accept=".json" style="display:none;" onchange="handleATSWeightsFile(event)">
             </div>
 
             <!-- Analysis Steps -->
@@ -6883,8 +6919,10 @@ function exportData() {
       governance: governanceItems,
       starStories: starStories,
       jobAI: JSON.parse(localStorage.getItem('jobai-data') || '{}'),
-      jobAISkipRules: JSON.parse(localStorage.getItem('jobai-skiprules') || '[]'),
+      jobAISkipRules: localStorage.getItem('jobai-skiprules') || '',
       jobAIGovRules: localStorage.getItem('jobai-govrules') || '',
+      jobAIScoringThresholds: localStorage.getItem('jobai-scoring') || '',
+      jobAIATSWeights: localStorage.getItem('jobai-atsweights') || '',
       jobAISteps: JSON.parse(localStorage.getItem('jobai-steps') || '[]'),
       exportDate: new Date().toISOString(),
       version: 'Job Pipeline v1.0'
@@ -7146,8 +7184,10 @@ function handleJSONFileSelect(event) {
       }
       
       if (data.jobAI)          localStorage.setItem('jobai-data',      JSON.stringify(data.jobAI));
-      if (Array.isArray(data.jobAISkipRules)) localStorage.setItem('jobai-skiprules', JSON.stringify(data.jobAISkipRules));
+      if (typeof data.jobAISkipRules === 'string') localStorage.setItem('jobai-skiprules', data.jobAISkipRules); else if (Array.isArray(data.jobAISkipRules)) localStorage.setItem('jobai-skiprules', data.jobAISkipRules.map(r => r.rule || r).join('\n'));
       if (typeof data.jobAIGovRules === 'string') localStorage.setItem('jobai-govrules', data.jobAIGovRules);
+      if (typeof data.jobAIScoringThresholds === 'string') localStorage.setItem('jobai-scoring', data.jobAIScoringThresholds);
+      if (typeof data.jobAIATSWeights === 'string') localStorage.setItem('jobai-atsweights', data.jobAIATSWeights);
       if (Array.isArray(data.jobAISteps)) localStorage.setItem('jobai-steps', JSON.stringify(data.jobAISteps));
       
       alert('✓ Data imported successfully!');
@@ -9168,9 +9208,11 @@ async function syncODLoad() {
         localStorage.setItem('additional-docs',  JSON.stringify(additionalDocs));
         localStorage.setItem('interview-prep',   JSON.stringify(interviewPrep));
         if (data.jobAI)          localStorage.setItem('jobai-data',      JSON.stringify(data.jobAI));
-        if (Array.isArray(data.jobAISkipRules)) localStorage.setItem('jobai-skiprules', JSON.stringify(data.jobAISkipRules));
+        if (typeof data.jobAISkipRules === 'string') localStorage.setItem('jobai-skiprules', data.jobAISkipRules); else if (Array.isArray(data.jobAISkipRules)) localStorage.setItem('jobai-skiprules', data.jobAISkipRules.map(r => r.rule || r).join('\n'));
         if (typeof data.jobAIGovRules === 'string') localStorage.setItem('jobai-govrules', data.jobAIGovRules);
         if (Array.isArray(data.jobAISteps)) localStorage.setItem('jobai-steps', JSON.stringify(data.jobAISteps));
+        if (typeof data.jobAIScoringThresholds === 'string') localStorage.setItem('jobai-scoring', data.jobAIScoringThresholds);
+        if (typeof data.jobAIATSWeights === 'string') localStorage.setItem('jobai-atsweights', data.jobAIATSWeights);
         renderList();
         calculateConversionMetrics();
         syncSetStatus('#27ae60', 'Loaded from OneDrive — data up to date', 'Reconnect', true);
@@ -9249,11 +9291,14 @@ function loadJobAI() {
   set('jai-comp', s.comp);
   set('jai-location', s.location);
   set('jai-strengths', s.strengths);
+  const ctEl = document.getElementById('jai-careertrack'); if (ctEl) ctEl.value = s.careerTrack || '';
   const wm = document.getElementById('jai-workmodel');
   if (wm) wm.value = s.workmodel || 'any';
   selectAITarget(s.aiTarget || 'claude');
   initSkipRules();
   initGovRules();
+  initScoringThresholds();
+  initATSWeights();
   initAnalysisSteps();
   if (s.promptSetup) { const el = document.getElementById('jai-prompt-setup'); if (el) el.value = s.promptSetup; }
   if (s.promptJD)    { const el = document.getElementById('jai-prompt-jd');    if (el) el.value = s.promptJD;    }
@@ -9262,30 +9307,36 @@ function loadJobAI() {
 function collectJobAIFields() {
   const get = id => { const el = document.getElementById(id); return el ? el.value.trim() : ''; };
   return {
-    level: get('jai-level'), specialty: get('jai-specialty'),
-    comp: get('jai-comp'), location: get('jai-location'),
-    workmodel: get('jai-workmodel'), strengths: get('jai-strengths'),
-    aiTarget: get('jai-target'),
-    promptSetup: get('jai-prompt-setup'), promptJD: get('jai-prompt-jd'),
-    savedAt: new Date().toISOString()
+    level:       get('jai-level'),
+    specialty:   get('jai-specialty'),
+    comp:        get('jai-comp'),
+    location:    get('jai-location'),
+    workmodel:   get('jai-workmodel'),
+    strengths:   get('jai-strengths'),
+    careerTrack: get('jai-careertrack'),
+    aiTarget:    get('jai-target'),
+    promptSetup: get('jai-prompt-setup'),
+    promptJD:    get('jai-prompt-jd'),
+    savedAt:     new Date().toISOString()
   };
 }
 
 function saveJobAI() {
   jobAIData = collectJobAIFields();
   localStorage.setItem(JOB_AI_STORAGE_KEY, JSON.stringify(jobAIData));
-  saveSkipRules(true); saveGovRules(true); saveAnalysisSteps(true);
+  saveSkipRules(true); saveGovRules(true); saveScoringThresholds(true); saveATSWeights(true); saveAnalysisSteps(true);
   const status = document.getElementById('jobai-save-status');
   if (status) { status.textContent = 'All sections saved.'; setTimeout(() => status.textContent = '', 2500); }
 }
-
 function backupJobAI() {
   jobAIData = collectJobAIFields();
-  const rules = JSON.parse(document.getElementById('jai-skiprules-data').value || '[]');
+  const skipRulesText = (document.getElementById('jai-skiprules') || {}).value || '';
   const govRules = (document.getElementById('jai-govrules') || {}).value || '';
+  const scoringThresholds = (document.getElementById('jai-scoring') || {}).value || '';
+  const atsWeights = (document.getElementById('jai-atsweights') || {}).value || '';
   const steps = JSON.parse(document.getElementById('jai-steps-data').value || '[]');
   const blob = new Blob([JSON.stringify({
-    ...jobAIData, skipRules: rules, govRules, analysisSteps: steps,
+    ...jobAIData, skipRules: skipRulesText, govRules, scoringThresholds, atsWeights, analysisSteps: steps,
     exportedAt: new Date().toISOString(), dataType: 'jobai'
   }, null, 2)], { type: 'application/json' });
   const a = document.createElement('a');
@@ -9302,8 +9353,15 @@ function handleJobAIFile(event) {
     try {
       const data = JSON.parse(e.target.result);
       jobAIData = data; localStorage.setItem(JOB_AI_STORAGE_KEY, JSON.stringify(jobAIData));
-      if (Array.isArray(data.skipRules)) localStorage.setItem(SKIP_RULES_KEY, JSON.stringify(data.skipRules));
+      // skipRules may be string (new) or array (legacy chips)
+      if (typeof data.skipRules === 'string') {
+        localStorage.setItem(SKIP_RULES_KEY, data.skipRules);
+      } else if (Array.isArray(data.skipRules)) {
+        localStorage.setItem(SKIP_RULES_KEY, data.skipRules.map(r => r.rule || r).join('\n'));
+      }
       if (typeof data.govRules === 'string') localStorage.setItem(GOV_RULES_KEY, data.govRules);
+      if (typeof data.scoringThresholds === 'string') localStorage.setItem(SCORING_KEY, data.scoringThresholds);
+      if (typeof data.atsWeights === 'string') localStorage.setItem(ATS_WEIGHTS_KEY, data.atsWeights);
       if (Array.isArray(data.analysisSteps)) localStorage.setItem(ANALYSIS_STEPS_KEY, JSON.stringify(data.analysisSteps));
       loadJobAI();
       const status = document.getElementById('jobai-save-status');
@@ -9314,39 +9372,15 @@ function handleJobAIFile(event) {
   reader.readAsText(file);
 }
 
-// ── Auto-Skip Rules (Chip UI) ─────────────────────────────────────────────────
-function renderSkipRules(rules) {
-  const chips = document.getElementById('jai-skiprules-chips');
-  const dataInput = document.getElementById('jai-skiprules-data');
-  if (!chips) return;
-  dataInput.value = JSON.stringify(rules);
-  if (rules.length === 0) {
-    chips.innerHTML = '<span style="font-size:11px;color:var(--color-text-secondary);">No rules yet. Type one above and click + Add.</span>';
-    return;
-  }
-  chips.innerHTML = rules.map((r, i) => `
-    <span onclick="removeSkipRule(${i})" title="Click to remove" style="display:inline-flex;align-items:center;gap:4px;background:rgba(231,76,60,0.12);border:1px solid rgba(231,76,60,0.35);color:#e74c3c;border-radius:20px;padding:3px 10px 3px 8px;font-size:11px;cursor:pointer;user-select:none;">
-      <span style="font-size:10px;font-weight:700;opacity:0.8;">✕</span>${r.rule}
-    </span>`).join('');
-}
-function addSkipRule() {
-  const input = document.getElementById('jai-skiprule-input');
-  if (!input || !input.value.trim()) return;
-  const current = JSON.parse(document.getElementById('jai-skiprules-data').value || '[]');
-  current.push({ rule: input.value.trim() }); input.value = ''; renderSkipRules(current);
-}
-function removeSkipRule(index) {
-  const current = JSON.parse(document.getElementById('jai-skiprules-data').value || '[]');
-  current.splice(index, 1); renderSkipRules(current);
-}
+// ── Auto-Skip Rules (Textarea, independent storage) ───────────────────────────
 function saveSkipRules(silent) {
-  const rules = JSON.parse(document.getElementById('jai-skiprules-data').value || '[]');
-  localStorage.setItem(SKIP_RULES_KEY, JSON.stringify(rules));
+  const val = (document.getElementById('jai-skiprules') || {}).value || '';
+  localStorage.setItem(SKIP_RULES_KEY, val);
   if (!silent) { const s = document.getElementById('jai-skiprules-status'); if (s) { s.textContent = 'Rules saved.'; setTimeout(() => s.textContent = '', 2000); } }
 }
 function backupSkipRules() {
-  const rules = JSON.parse(document.getElementById('jai-skiprules-data').value || '[]');
-  const blob = new Blob([JSON.stringify({ skipRules: rules, savedAt: new Date().toISOString() }, null, 2)], { type: 'application/json' });
+  const val = (document.getElementById('jai-skiprules') || {}).value || '';
+  const blob = new Blob([JSON.stringify({ skipRules: val, savedAt: new Date().toISOString() }, null, 2)], { type: 'application/json' });
   const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = 'jobai-skiprules-' + new Date().toISOString().slice(0,10) + '.json'; a.click();
 }
 function restoreSkipRules() { document.getElementById('jai-skiprules-file').click(); }
@@ -9355,15 +9389,18 @@ function handleSkipRulesFile(event) {
   const reader = new FileReader();
   reader.onload = e => {
     try {
-      const data = JSON.parse(e.target.result); const rules = data.skipRules || data;
-      if (Array.isArray(rules)) { renderSkipRules(rules); localStorage.setItem(SKIP_RULES_KEY, JSON.stringify(rules)); const s = document.getElementById('jai-skiprules-status'); if (s) { s.textContent = 'Restored.'; setTimeout(() => s.textContent = '', 2000); } }
-      else alert('Invalid file format.');
+      const data = JSON.parse(e.target.result);
+      const val = typeof data.skipRules === 'string' ? data.skipRules : (Array.isArray(data.skipRules) ? data.skipRules.map(r => r.rule || r).join('\n') : '');
+      const el = document.getElementById('jai-skiprules'); if (el) el.value = val;
+      localStorage.setItem(SKIP_RULES_KEY, val);
+      const s = document.getElementById('jai-skiprules-status'); if (s) { s.textContent = 'Restored.'; setTimeout(() => s.textContent = '', 2000); }
     } catch(err) { alert('Could not read file.'); } event.target.value = '';
   }; reader.readAsText(file);
 }
 function initSkipRules() {
   const stored = localStorage.getItem(SKIP_RULES_KEY);
-  renderSkipRules(stored ? JSON.parse(stored) : []);
+  const el = document.getElementById('jai-skiprules');
+  if (el && stored !== null) el.value = stored;
 }
 
 // ── Governance Rules ──────────────────────────────────────────────────────────
@@ -9393,6 +9430,100 @@ function handleGovRulesFile(event) {
 function initGovRules() {
   const stored = localStorage.getItem(GOV_RULES_KEY);
   const el = document.getElementById('jai-govrules'); if (el) el.value = stored || '';
+}
+
+// ── Scoring Thresholds (independent storage) ──────────────────────────────────
+const SCORING_KEY = 'jobai-scoring';
+
+const DEFAULT_SCORING = `Confidence scoring scale:
+9.0-10.0 — Exceptional match. Top priority. Apply immediately.
+8.0-8.9 — Strong match. Highly competitive. Apply.
+7.0-7.9 — Good fit with considerations. Evaluate strategic value.
+6.5-6.9 — Moderate fit. Requires strategic justification (warm lead, unique advantage, exceptional circumstance).
+Below 6.5 — Poor fit. Skip unless an explicit exception is documented.
+
+Minimum fit threshold for APPLY verdict: 6.5 out of 10.
+Warm lead or documented strategic exception may override this threshold. Exception must be stated explicitly by the user before analysis proceeds.`;
+
+function saveScoringThresholds(silent) {
+  const val = (document.getElementById('jai-scoring') || {}).value || '';
+  localStorage.setItem(SCORING_KEY, val);
+  if (!silent) { const s = document.getElementById('jai-scoring-status'); if (s) { s.textContent = 'Saved.'; setTimeout(() => s.textContent = '', 2000); } }
+}
+function backupScoringThresholds() {
+  const val = (document.getElementById('jai-scoring') || {}).value || '';
+  const blob = new Blob([JSON.stringify({ scoringThresholds: val, savedAt: new Date().toISOString() }, null, 2)], { type: 'application/json' });
+  const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = 'jobai-scoring-' + new Date().toISOString().slice(0,10) + '.json'; a.click();
+}
+function restoreScoringThresholds() { document.getElementById('jai-scoring-file').click(); }
+function handleScoringThresholdsFile(event) {
+  const file = event.target.files[0]; if (!file) return;
+  const reader = new FileReader();
+  reader.onload = e => {
+    try {
+      const data = JSON.parse(e.target.result);
+      const val = typeof data.scoringThresholds === 'string' ? data.scoringThresholds : '';
+      const el = document.getElementById('jai-scoring'); if (el) el.value = val;
+      localStorage.setItem(SCORING_KEY, val);
+      const s = document.getElementById('jai-scoring-status'); if (s) { s.textContent = 'Restored.'; setTimeout(() => s.textContent = '', 2000); }
+    } catch(err) { alert('Could not read file.'); } event.target.value = '';
+  }; reader.readAsText(file);
+}
+function initScoringThresholds() {
+  const stored = localStorage.getItem(SCORING_KEY);
+  const el = document.getElementById('jai-scoring');
+  if (el) el.value = (stored !== null) ? stored : DEFAULT_SCORING;
+}
+
+// ── ATS / iCIMS Scoring Weights (independent storage) ─────────────────────────
+const ATS_WEIGHTS_KEY = 'jobai-atsweights';
+
+const DEFAULT_ATS_WEIGHTS = `ATS scoring weights (for formal tree output):
+Exact phrase coverage: 40 points — direct keyword matches from the job description found in the resume
+Tool and method mentions: 30 points — named platforms, methodologies, certifications
+High-signal sections (title, Professional Summary, most recent role): 20 points
+Synonym and variant coverage: 10 points — related terms that map to JD language
+
+iCIMS competency scoring weights:
+Leadership scope: 25 points — team size, reporting structure, organizational reach
+Complexity of initiatives: 25 points — scale, risk, regulatory environment, multi-stakeholder delivery
+Outcomes and metrics: 25 points — quantified results, cost savings, adoption rates, timelines
+Domain fit: 15 points — industry and platform alignment
+Change and delivery maturity: 10 points — frameworks demonstrated (ITIL, Agile, CAB, runbooks)
+
+Resume customization thresholds (recommended):
+80% or higher keyword match — use resume as-is
+70-79% keyword match — light customization, add 2-3 missing terms to existing bullets
+Below 70% keyword match — heavy customization, reframe Professional Summary and Skills section`;
+
+function saveATSWeights(silent) {
+  const val = (document.getElementById('jai-atsweights') || {}).value || '';
+  localStorage.setItem(ATS_WEIGHTS_KEY, val);
+  if (!silent) { const s = document.getElementById('jai-ats-status'); if (s) { s.textContent = 'Saved.'; setTimeout(() => s.textContent = '', 2000); } }
+}
+function backupATSWeights() {
+  const val = (document.getElementById('jai-atsweights') || {}).value || '';
+  const blob = new Blob([JSON.stringify({ atsWeights: val, savedAt: new Date().toISOString() }, null, 2)], { type: 'application/json' });
+  const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = 'jobai-atsweights-' + new Date().toISOString().slice(0,10) + '.json'; a.click();
+}
+function restoreATSWeights() { document.getElementById('jai-atsweights-file').click(); }
+function handleATSWeightsFile(event) {
+  const file = event.target.files[0]; if (!file) return;
+  const reader = new FileReader();
+  reader.onload = e => {
+    try {
+      const data = JSON.parse(e.target.result);
+      const val = typeof data.atsWeights === 'string' ? data.atsWeights : '';
+      const el = document.getElementById('jai-atsweights'); if (el) el.value = val;
+      localStorage.setItem(ATS_WEIGHTS_KEY, val);
+      const s = document.getElementById('jai-ats-status'); if (s) { s.textContent = 'Restored.'; setTimeout(() => s.textContent = '', 2000); }
+    } catch(err) { alert('Could not read file.'); } event.target.value = '';
+  }; reader.readAsText(file);
+}
+function initATSWeights() {
+  const stored = localStorage.getItem(ATS_WEIGHTS_KEY);
+  const el = document.getElementById('jai-atsweights');
+  if (el) el.value = (stored !== null) ? stored : DEFAULT_ATS_WEIGHTS;
 }
 
 // ── Analysis Steps (draggable card list) ──────────────────────────────────────
@@ -9508,17 +9639,20 @@ function generateJobAIPrompts() {
   const location   = get('jai-location') || 'not specified';
   const workmodel  = get('jai-workmodel') || 'any';
   const strengths  = get('jai-strengths');
+  const careerTrack = get('jai-careertrack');
   const target     = get('jai-target')   || 'claude';
-  const skipRules  = JSON.parse(document.getElementById('jai-skiprules-data').value || '[]');
-  const govRules   = (document.getElementById('jai-govrules') || {}).value || '';
+  const skipRulesText = (document.getElementById('jai-skiprules')   || {}).value || '';
+  const govRules      = (document.getElementById('jai-govrules')    || {}).value || '';
+  const scoring       = (document.getElementById('jai-scoring')     || {}).value || '';
+  const atsWeights    = (document.getElementById('jai-atsweights')  || {}).value || '';
   const steps      = getSteps();
 
   const strengthLines = strengths
     ? strengths.split('\n').filter(s => s.trim()).map(s => '- ' + s.trim()).join('\n')
     : '- Not specified';
 
-  const userSkipLines = skipRules.length > 0
-    ? skipRules.map(r => '- ' + r.rule).join('\n')
+  const skipLines = skipRulesText.trim()
+    ? skipRulesText.split('\n').filter(s => s.trim()).map(s => '- ' + s.trim()).join('\n')
     : '- None defined';
 
   const workmodelText = { any: 'open to remote, hybrid, or on-site', remote: 'strong preference for remote', hybrid: 'preference for hybrid', onsite: 'on-site acceptable' }[workmodel] || 'any';
@@ -9527,8 +9661,13 @@ function generateJobAIPrompts() {
     ? 'SETUP NOTE: For persistent context, paste this into Settings > Custom Instructions in ChatGPT. Attach your resume files to your first message in each new session.'
     : 'SETUP NOTE: For persistent context, add this to a Claude Project. Attach your resume files to your first message in each new session.';
 
-  const govSection = govRules.trim()
-    ? `\nGOVERNANCE RULES\nApply the following proprietary frameworks and scoring models during every analysis:\n${govRules.trim()}\n`
+  const govParts = [govRules, scoring, atsWeights].map(s => s.trim()).filter(Boolean);
+  const govSection = govParts.length > 0
+    ? `\nGOVERNANCE RULES\nApply the following frameworks and scoring models during every analysis:\n\n${govParts.join('\n\n')}\n`
+    : '';
+
+  const careerTrackSection = careerTrack.trim()
+    ? `\nCAREER TRACK\n${careerTrack.trim()}\n`
     : '';
 
   const stepsSection = steps.length > 0
@@ -9546,10 +9685,7 @@ Work Model: ${workmodelText}
 
 CORE STRENGTHS
 ${strengthLines}
-
-CAREER TRACK
-This candidate is on the COO delivery track, not the CIO infrastructure track. COO track means Platform Implementation Delivery: ServiceNow, Maximo, Oracle Fusion, ITSM platform ownership, release and cutover leadership, governance framework implementation, CAB Chair leadership, technical program management. CIO track means: data center operations, server and storage management, helpdesk operations, network management, cybersecurity leadership, IT strategy formulation, enterprise architecture policy, business continuity and disaster recovery. Skip any role that is primarily CIO track regardless of compensation.
-${govSection}
+${careerTrackSection}${govSection}
 RESUME HANDLING
 Before any analysis, confirm that one or more resume files are attached to this message. If no resume is attached, respond only with: "No resume detected. Please attach your resume file or files and resend. I cannot proceed without them."
 
@@ -9558,27 +9694,7 @@ Once resumes are received, review all attached files. Identify and label each va
 AUTO-SKIP RULES
 Run all auto-skip rules before any analysis. A match returns an immediate SKIP verdict with the specific rule that fired. No further analysis is produced on a SKIP. The only exceptions are documented warm leads or explicit strategic overrides stated by the user.
 
-Standard hard auto-skip triggers:
-- No salary listed
-- Salary below compensation floor with no warm lead or documented exception
-- Management consulting strategy firms (McKinsey, BCG, Bain)
-- Big 4 strategy and advisory arms unless the role is internal IT running ServiceNow delivery or ITSM governance
-- Digital agencies
-- Environmental and engineering professional services firms regardless of role title
-- PROSCI certification listed as required
-- Product Management roles (WHAT and WHY, not HOW and WHEN)
-- Scrum Master or Agile Coach facilitation roles
-- Software Engineering Management
-- ERP or Supply Chain specialty (SAP functional, Oracle ERP functional)
-- eCommerce platform roles
-- IT Infrastructure Operations (data center, server, storage, helpdesk)
-- DevOps Platform Engineering technical specialist roles
-- CIO track roles: IT strategy formulation, cybersecurity leadership, business continuity, enterprise architecture policy
-
-Consulting lane check: confirm the role leads ServiceNow delivery, Release Management, or ITSM governance. Skip advisory, strategy, or domain-unrelated arms.
-
-User-defined additional rules:
-${userSkipLines}
+${skipLines}
 
 ANALYSIS FRAMEWORK
 For each job description received, execute all steps in sequence:
@@ -9644,7 +9760,7 @@ function copyPrompt(which) {
 }
 
 // ── Init on DOMContentLoaded ──────────────────────────────────────────────────
-window.addEventListener('DOMContentLoaded', () => { initJobAIUnlock(); initSkipRules(); initGovRules(); initAnalysisSteps(); });
+window.addEventListener('DOMContentLoaded', () => { initJobAIUnlock(); initSkipRules(); initGovRules(); initScoringThresholds(); initATSWeights(); initAnalysisSteps(); });
 
 // ============================================================================
 // END JOB AI
@@ -9662,8 +9778,10 @@ function syncBuildPayload() {
     interviewPrep: interviewPrep,
     profile: profileData,
     jobAI: JSON.parse(localStorage.getItem('jobai-data') || '{}'),
-    jobAISkipRules: JSON.parse(localStorage.getItem('jobai-skiprules') || '[]'),
+    jobAISkipRules: localStorage.getItem('jobai-skiprules') || '',
     jobAIGovRules: localStorage.getItem('jobai-govrules') || '',
+    jobAIScoringThresholds: localStorage.getItem('jobai-scoring') || '',
+    jobAIATSWeights: localStorage.getItem('jobai-atsweights') || '',
     jobAISteps: JSON.parse(localStorage.getItem('jobai-steps') || '[]')
   }, null, 2);
 }
@@ -9786,9 +9904,11 @@ async function syncLoad() {
         localStorage.setItem('additional-docs',  JSON.stringify(additionalDocs));
         localStorage.setItem('interview-prep',   JSON.stringify(interviewPrep));
         if (data.jobAI)          localStorage.setItem('jobai-data',      JSON.stringify(data.jobAI));
-        if (Array.isArray(data.jobAISkipRules)) localStorage.setItem('jobai-skiprules', JSON.stringify(data.jobAISkipRules));
+        if (typeof data.jobAISkipRules === 'string') localStorage.setItem('jobai-skiprules', data.jobAISkipRules); else if (Array.isArray(data.jobAISkipRules)) localStorage.setItem('jobai-skiprules', data.jobAISkipRules.map(r => r.rule || r).join('\n'));
         if (typeof data.jobAIGovRules === 'string') localStorage.setItem('jobai-govrules', data.jobAIGovRules);
         if (Array.isArray(data.jobAISteps)) localStorage.setItem('jobai-steps', JSON.stringify(data.jobAISteps));
+        if (typeof data.jobAIScoringThresholds === 'string') localStorage.setItem('jobai-scoring', data.jobAIScoringThresholds);
+        if (typeof data.jobAIATSWeights === 'string') localStorage.setItem('jobai-atsweights', data.jobAIATSWeights);
         renderList();
         calculateConversionMetrics();
         syncSetStatus('#27ae60', 'Loaded from Drive — data up to date', 'Reconnect', true);
