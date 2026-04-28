@@ -4212,15 +4212,7 @@ function loadProfile() {
     const googleCidEl = document.getElementById('sync-google-client-id');
     const odCidEl = document.getElementById('sync-onedrive-client-id');
     if (filenameEl) filenameEl.value = profileData.syncFilename || 'jd-pipeline.json';
-    // Restore provider from dedicated localStorage key (most reliable source)
-    const storedProvider = localStorage.getItem('sync-provider');
-    const resolvedProvider = (storedProvider && storedProvider !== 'none') ? storedProvider
-      : (profileData.syncProvider && profileData.syncProvider !== 'none') ? profileData.syncProvider
-      : null;
-    if (resolvedProvider) {
-      selectSyncProvider(resolvedProvider);
-      syncSetStar(true);
-    }
+    // Provider restore is handled by syncInitProvider() after all vars are declared
     if (googleCidEl) googleCidEl.value = profileData.syncGoogleClientId || '';
     if (odCidEl) odCidEl.value = profileData.syncOneDriveClientId || '';
     
@@ -8675,6 +8667,18 @@ let _syncFileId      = null;   // Drive file ID once located/created
 let _syncClient      = null;   // GIS token client instance
 let _syncProvider    = 'none'; // active provider
 
+// ── Provider restore on page load ─────────────────────────────────────────────
+// Runs after all sync vars are declared. DOM is guaranteed ready via DOMContentLoaded.
+function syncInitProvider() {
+  const saved = localStorage.getItem('sync-provider');
+  if (saved && saved !== 'none') {
+    _syncProvider = saved;
+    selectSyncProvider(saved);
+    syncSetStar(true);
+  }
+}
+window.addEventListener('DOMContentLoaded', syncInitProvider);
+
 // ── Helpers ──────────────────────────────────────────────────────────────────
 
 function syncGetFilename() {
@@ -8706,13 +8710,7 @@ function syncSetBadge(text, bg, color) {
 
 function syncSetStar(show) {
   const tab = document.getElementById('main-tab-repository');
-  if (!tab) {
-    // DOM not ready yet — defer until it is
-    if (show) {
-      window.addEventListener('DOMContentLoaded', function() { syncSetStar(true); }, { once: true });
-    }
-    return;
-  }
+  if (!tab) return;
   const existing = tab.querySelector('.sync-star');
   if (show && !existing) {
     const star = document.createElement('span');
