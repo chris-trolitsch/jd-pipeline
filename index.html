@@ -4151,7 +4151,7 @@ function saveProfile() {
   if (filenameEl) profileData.syncFilename = filenameEl.value.trim() || 'jd-pipeline.json';
   if (googleCidEl) profileData.syncGoogleClientId = googleCidEl.value.trim();
   if (odCidEl) profileData.syncOneDriveClientId = odCidEl.value.trim();
-  profileData.syncProvider = _syncProvider;
+  profileData.syncProvider = localStorage.getItem('sync-provider') || 'none';
   
   localStorage.setItem('profile-data', JSON.stringify(profileData));
   
