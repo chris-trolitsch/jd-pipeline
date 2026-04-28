@@ -4151,6 +4151,7 @@ function saveProfile() {
   if (filenameEl) profileData.syncFilename = filenameEl.value.trim() || 'jd-pipeline.json';
   if (googleCidEl) profileData.syncGoogleClientId = googleCidEl.value.trim();
   if (odCidEl) profileData.syncOneDriveClientId = odCidEl.value.trim();
+  profileData.syncProvider = _syncProvider;
   
   localStorage.setItem('profile-data', JSON.stringify(profileData));
   
@@ -4211,11 +4212,11 @@ function loadProfile() {
     const googleCidEl = document.getElementById('sync-google-client-id');
     const odCidEl = document.getElementById('sync-onedrive-client-id');
     if (filenameEl) filenameEl.value = profileData.syncFilename || 'jd-pipeline.json';
-    // Restore provider: profile data wins, localStorage as fallback
+    // Restore provider from dedicated localStorage key (most reliable source)
     const storedProvider = localStorage.getItem('sync-provider');
-    const resolvedProvider = (profileData.syncProvider && profileData.syncProvider !== 'none')
-      ? profileData.syncProvider
-      : (storedProvider && storedProvider !== 'none' ? storedProvider : null);
+    const resolvedProvider = (storedProvider && storedProvider !== 'none') ? storedProvider
+      : (profileData.syncProvider && profileData.syncProvider !== 'none') ? profileData.syncProvider
+      : null;
     if (resolvedProvider) {
       selectSyncProvider(resolvedProvider);
       syncSetStar(true);
@@ -8705,7 +8706,13 @@ function syncSetBadge(text, bg, color) {
 
 function syncSetStar(show) {
   const tab = document.getElementById('main-tab-repository');
-  if (!tab) return;
+  if (!tab) {
+    // DOM not ready yet — defer until it is
+    if (show) {
+      window.addEventListener('DOMContentLoaded', function() { syncSetStar(true); }, { once: true });
+    }
+    return;
+  }
   const existing = tab.querySelector('.sync-star');
   if (show && !existing) {
     const star = document.createElement('span');
