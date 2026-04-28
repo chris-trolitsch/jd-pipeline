@@ -819,7 +819,7 @@ input, select, textarea {
       <button class="tab-button" onclick="switchRepoTab('governance')" id="tab-repo-governance">Governance</button>
       <button class="tab-button" onclick="switchRepoTab('star')" id="tab-repo-star"><span id="story-type-label">STAR</span> Stories</button>
       <button class="tab-button" onclick="switchRepoTab('documents')" id="tab-repo-documents">Additional Documents</button>
-      <button class="tab-button" onclick="switchRepoTab('jobai')" id="tab-repo-jobai" style="display:none; border-left: 2px solid #e74c3c;">Job AI</button>
+      <button class="tab-button" onclick="switchRepoTab('jobai')" id="tab-repo-jobai">Job AI</button>
     </div>
     
     <!-- Profile Tab -->
@@ -1063,33 +1063,29 @@ input, select, textarea {
       <div style="padding: 8px 0;">
 
         <!-- Header -->
-        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
           <div>
             <h3 style="margin: 0; font-size: 16px; color: var(--color-text-primary);">Job AI Configuration</h3>
-            <div style="font-size: 12px; color: var(--color-text-secondary); margin-top: 4px;">Build your AI setup prompt and JD analysis prompt from your career profile.</div>
+            <div style="font-size: 12px; color: var(--color-text-secondary); margin-top: 3px;">Build your AI setup prompt from your career profile. Generate, copy, and paste into your AI of choice.</div>
           </div>
           <div style="display: flex; gap: 8px;">
-            <button onclick="saveJobAI()" style="padding: 6px 14px; font-size: 12px; background: var(--color-background-success); color: var(--color-text-success); border: 1px solid var(--color-text-success); border-radius: 4px; cursor: pointer;">Save</button>
+            <button onclick="saveJobAI()" style="padding: 6px 14px; font-size: 12px; background: var(--color-background-success); color: var(--color-text-success); border: 1px solid var(--color-text-success); border-radius: 4px; cursor: pointer;">Save All</button>
             <button onclick="backupJobAI()" style="padding: 6px 14px; font-size: 12px; background: var(--color-background-secondary); color: var(--color-text-secondary); border: 1px solid var(--color-border-primary); border-radius: 4px; cursor: pointer;">Backup</button>
             <button onclick="restoreJobAI()" style="padding: 6px 14px; font-size: 12px; background: var(--color-background-warning); color: var(--color-text-warning); border: 1px solid var(--color-text-warning); border-radius: 4px; cursor: pointer;">Restore</button>
             <button onclick="importJobAI()" style="padding: 6px 14px; font-size: 12px; background: var(--color-background-info); color: var(--color-text-info); border: 1px solid var(--color-text-info); border-radius: 4px; cursor: pointer;">Import</button>
           </div>
         </div>
-        <div id="jobai-save-status" style="font-size: 12px; margin-bottom: 1rem; color: var(--color-text-success);"></div>
+        <div id="jobai-save-status" style="font-size: 12px; margin-bottom: 0.75rem; color: var(--color-text-success); min-height: 16px;"></div>
 
-        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+        <!-- 3-COLUMN GRID -->
+        <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 16px; align-items: start;">
 
-          <!-- LEFT COLUMN: Career Profile + Auto-Skip Rules -->
-          <div>
+          <!-- COLUMN 1: Career Profile + Auto-Skip Rules -->
+          <div style="display: flex; flex-direction: column; gap: 14px;">
 
             <!-- Career Profile -->
-            <div style="margin-bottom: 1.5rem; padding: 14px 16px; background: var(--color-background-secondary); border-radius: 8px; border-left: 3px solid #0d6efd;">
+            <div style="padding: 14px 16px; background: var(--color-background-secondary); border-radius: 8px; border-left: 3px solid #0d6efd;">
               <div style="font-size: 12px; font-weight: 700; color: #0d6efd; text-transform: uppercase; letter-spacing: 0.6px; margin-bottom: 12px;">Career Profile</div>
-
-              <div class="form-group">
-                <label class="form-label">Full Name</label>
-                <input type="text" id="jai-name" class="form-control" placeholder="Your full name">
-              </div>
               <div class="form-group">
                 <label class="form-label">Target Role Level</label>
                 <input type="text" id="jai-level" class="form-control" placeholder="e.g. Senior Manager to Director">
@@ -1117,29 +1113,81 @@ input, select, textarea {
               </div>
               <div class="form-group" style="margin-bottom: 0;">
                 <label class="form-label">Core Strengths (one per line)</label>
-                <textarea id="jai-strengths" class="form-control" style="min-height: 80px; font-size: 12px;" placeholder="Enterprise cutover leadership&#10;ServiceNow ITSM platform ownership&#10;Three-Pillar governance framework"></textarea>
+                <textarea id="jai-strengths" class="form-control" style="min-height: 72px; font-size: 12px;" placeholder="Enterprise cutover leadership&#10;ServiceNow ITSM platform ownership&#10;Financial services governance"></textarea>
               </div>
             </div>
 
             <!-- Auto-Skip Rules -->
             <div style="padding: 14px 16px; background: var(--color-background-secondary); border-radius: 8px; border-left: 3px solid #e74c3c;">
-              <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
+              <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px;">
                 <div style="font-size: 12px; font-weight: 700; color: #e74c3c; text-transform: uppercase; letter-spacing: 0.6px;">Auto-Skip Rules</div>
-                <button onclick="addSkipRule()" style="padding: 3px 10px; font-size: 11px; background: #e74c3c; color: white; border: none; border-radius: 4px; cursor: pointer;">+ Add Rule</button>
+                <div style="display: flex; gap: 5px;">
+                  <button onclick="saveSkipRules()" style="padding: 2px 8px; font-size: 11px; background: var(--color-background-success); color: var(--color-text-success); border: 1px solid var(--color-text-success); border-radius: 4px; cursor: pointer;">Save</button>
+                  <button onclick="backupSkipRules()" style="padding: 2px 8px; font-size: 11px; background: var(--color-background-secondary); color: var(--color-text-secondary); border: 1px solid var(--color-border-primary); border-radius: 4px; cursor: pointer;">Backup</button>
+                  <button onclick="restoreSkipRules()" style="padding: 2px 8px; font-size: 11px; background: var(--color-background-warning); color: var(--color-text-warning); border: 1px solid var(--color-text-warning); border-radius: 4px; cursor: pointer;">Restore</button>
+                </div>
               </div>
-              <div style="font-size: 11px; color: var(--color-text-secondary); margin-bottom: 10px;">Roles matching any of these rules are automatically flagged as skip. The AI enforces these before any analysis.</div>
-              <div id="jai-skiprules-list" style="display: flex; flex-direction: column; gap: 6px; max-height: 300px; overflow-y: auto;"></div>
+              <div style="font-size: 11px; color: var(--color-text-secondary); margin-bottom: 8px;">Personal skip rules injected into every generated prompt. Independently saved. Click a chip to remove.</div>
+              <div id="jai-skiprules-status" style="font-size: 11px; color: var(--color-text-success); min-height: 14px; margin-bottom: 6px;"></div>
+              <div id="jai-skiprules-chips" style="display: flex; flex-wrap: wrap; gap: 5px; min-height: 28px; margin-bottom: 8px;"></div>
+              <div style="display: flex; gap: 6px;">
+                <input type="text" id="jai-skiprule-input" class="form-control" style="flex: 1; font-size: 12px;" placeholder="Add a rule and press Enter..." onkeydown="if(event.key==='Enter'){addSkipRule();}">
+                <button onclick="addSkipRule()" style="padding: 4px 10px; font-size: 11px; background: #e74c3c; color: white; border: none; border-radius: 4px; cursor: pointer; white-space: nowrap;">+ Add</button>
+              </div>
               <input type="hidden" id="jai-skiprules-data" value="[]">
+              <input type="file" id="jai-skiprules-file" accept=".json" style="display:none;" onchange="handleSkipRulesFile(event)">
             </div>
 
           </div>
 
-          <!-- RIGHT COLUMN: AI Target + Generated Prompts -->
-          <div>
+          <!-- COLUMN 2: Governance Rules + Analysis Steps -->
+          <div style="display: flex; flex-direction: column; gap: 14px;">
+
+            <!-- Governance Rules for Prompt -->
+            <div style="padding: 14px 16px; background: var(--color-background-secondary); border-radius: 8px; border-left: 3px solid #16a085;">
+              <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px;">
+                <div style="font-size: 12px; font-weight: 700; color: #16a085; text-transform: uppercase; letter-spacing: 0.6px;">Governance Rules for Prompt</div>
+                <div style="display: flex; gap: 5px;">
+                  <button onclick="saveGovRules()" style="padding: 2px 8px; font-size: 11px; background: var(--color-background-success); color: var(--color-text-success); border: 1px solid var(--color-text-success); border-radius: 4px; cursor: pointer;">Save</button>
+                  <button onclick="backupGovRules()" style="padding: 2px 8px; font-size: 11px; background: var(--color-background-secondary); color: var(--color-text-secondary); border: 1px solid var(--color-border-primary); border-radius: 4px; cursor: pointer;">Backup</button>
+                  <button onclick="restoreGovRules()" style="padding: 2px 8px; font-size: 11px; background: var(--color-background-warning); color: var(--color-text-warning); border: 1px solid var(--color-text-warning); border-radius: 4px; cursor: pointer;">Restore</button>
+                </div>
+              </div>
+              <div style="font-size: 11px; color: var(--color-text-secondary); margin-bottom: 8px;">Your proprietary governance frameworks injected verbatim into the prompt. Use for Three-Pillar, scoring models, or any methodology the AI must reference. Independently saved.</div>
+              <div id="jai-govrules-status" style="font-size: 11px; color: var(--color-text-success); min-height: 14px; margin-bottom: 6px;"></div>
+              <textarea id="jai-govrules" class="form-control" style="min-height: 180px; font-size: 12px; resize: vertical;" placeholder="Three-Pillar Governance Framework:&#10;- Pillar 1: Vendor Accountability and Peer Review&#10;- Pillar 2: Outcome-Based KPIs&#10;- Pillar 3: Strategic Translation&#10;&#10;Add any proprietary frameworks, scoring models, or rules the AI should apply during analysis."></textarea>
+              <input type="file" id="jai-govrules-file" accept=".json" style="display:none;" onchange="handleGovRulesFile(event)">
+            </div>
+
+            <!-- Analysis Steps -->
+            <div style="padding: 14px 16px; background: var(--color-background-secondary); border-radius: 8px; border-left: 3px solid #8e44ad;">
+              <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px;">
+                <div style="font-size: 12px; font-weight: 700; color: #8e44ad; text-transform: uppercase; letter-spacing: 0.6px;">Analysis Steps</div>
+                <div style="display: flex; gap: 5px;">
+                  <button onclick="saveAnalysisSteps()" style="padding: 2px 8px; font-size: 11px; background: var(--color-background-success); color: var(--color-text-success); border: 1px solid var(--color-text-success); border-radius: 4px; cursor: pointer;">Save</button>
+                  <button onclick="backupAnalysisSteps()" style="padding: 2px 8px; font-size: 11px; background: var(--color-background-secondary); color: var(--color-text-secondary); border: 1px solid var(--color-border-primary); border-radius: 4px; cursor: pointer;">Backup</button>
+                  <button onclick="restoreAnalysisSteps()" style="padding: 2px 8px; font-size: 11px; background: var(--color-background-warning); color: var(--color-text-warning); border: 1px solid var(--color-text-warning); border-radius: 4px; cursor: pointer;">Restore</button>
+                </div>
+              </div>
+              <div style="font-size: 11px; color: var(--color-text-secondary); margin-bottom: 8px;">The ordered steps the AI follows for each job description. Drag to reorder. Click to edit. Click ✕ to remove. Independently saved.</div>
+              <div id="jai-steps-status" style="font-size: 11px; color: var(--color-text-success); min-height: 14px; margin-bottom: 6px;"></div>
+              <div id="jai-steps-list" style="display: flex; flex-direction: column; gap: 5px; margin-bottom: 8px; max-height: 340px; overflow-y: auto;"></div>
+              <div style="display: flex; gap: 6px;">
+                <input type="text" id="jai-step-input" class="form-control" style="flex: 1; font-size: 12px;" placeholder="Add a step and press Enter..." onkeydown="if(event.key==='Enter'){addAnalysisStep();}">
+                <button onclick="addAnalysisStep()" style="padding: 4px 10px; font-size: 11px; background: #8e44ad; color: white; border: none; border-radius: 4px; cursor: pointer; white-space: nowrap;">+ Add</button>
+              </div>
+              <input type="hidden" id="jai-steps-data" value="[]">
+              <input type="file" id="jai-steps-file" accept=".json" style="display:none;" onchange="handleAnalysisStepsFile(event)">
+            </div>
+
+          </div>
+
+          <!-- COLUMN 3: AI Target + Generated Prompts -->
+          <div style="display: flex; flex-direction: column; gap: 14px;">
 
             <!-- AI Target -->
-            <div style="margin-bottom: 1.5rem; padding: 14px 16px; background: var(--color-background-secondary); border-radius: 8px; border-left: 3px solid #27ae60;">
-              <div style="font-size: 12px; font-weight: 700; color: #27ae60; text-transform: uppercase; letter-spacing: 0.6px; margin-bottom: 12px;">AI Target</div>
+            <div style="padding: 14px 16px; background: var(--color-background-secondary); border-radius: 8px; border-left: 3px solid #27ae60;">
+              <div style="font-size: 12px; font-weight: 700; color: #27ae60; text-transform: uppercase; letter-spacing: 0.6px; margin-bottom: 10px;">AI Target</div>
               <div style="display: flex; gap: 10px;">
                 <label id="jai-target-claude" onclick="selectAITarget('claude')" style="flex: 1; display: flex; flex-direction: column; align-items: center; gap: 4px; padding: 10px; background: #0d6efd; color: white; border-radius: 7px; border: 2px solid #0d6efd; cursor: pointer; text-align: center;">
                   <div style="font-size: 20px;">✦</div>
@@ -1156,7 +1204,7 @@ input, select, textarea {
             </div>
 
             <!-- Setup Prompt -->
-            <div style="margin-bottom: 1.5rem; padding: 14px 16px; background: var(--color-background-secondary); border-radius: 8px; border-left: 3px solid #9b59b6;">
+            <div style="padding: 14px 16px; background: var(--color-background-secondary); border-radius: 8px; border-left: 3px solid #9b59b6;">
               <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
                 <div style="font-size: 12px; font-weight: 700; color: #9b59b6; text-transform: uppercase; letter-spacing: 0.6px;">Prompt 1: Setup Prompt</div>
                 <div style="display: flex; gap: 6px;">
@@ -1164,26 +1212,26 @@ input, select, textarea {
                   <button onclick="copyPrompt('setup')" style="padding: 4px 10px; font-size: 11px; background: var(--color-background-primary); color: var(--color-text-primary); border: 1px solid var(--color-border-primary); border-radius: 4px; cursor: pointer;">Copy</button>
                 </div>
               </div>
-              <div style="font-size: 11px; color: var(--color-text-secondary); margin-bottom: 8px;">Paste this into your AI as the first message. Attach your resume file(s) to this message before sending.</div>
-              <textarea id="jai-prompt-setup" class="form-control" style="min-height: 200px; font-size: 11px; font-family: monospace; resize: vertical;" placeholder="Click Generate to build your setup prompt..." readonly></textarea>
-              <div id="jai-copy-setup-status" style="font-size: 11px; margin-top: 4px; color: var(--color-text-success);"></div>
+              <div style="font-size: 11px; color: var(--color-text-secondary); margin-bottom: 8px;">Paste this into your AI as the first message. Attach your resume files before sending.</div>
+              <textarea id="jai-prompt-setup" class="form-control" style="min-height: 220px; font-size: 11px; font-family: monospace; resize: vertical;" placeholder="Click Generate to build your setup prompt..." readonly></textarea>
+              <div id="jai-copy-setup-status" style="font-size: 11px; margin-top: 4px; color: var(--color-text-success); min-height: 14px;"></div>
             </div>
 
             <!-- JD Prompt -->
             <div style="padding: 14px 16px; background: var(--color-background-secondary); border-radius: 8px; border-left: 3px solid #f39c12;">
               <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
-                <div style="font-size: 12px; font-weight: 700; color: #f39c12; text-transform: uppercase; letter-spacing: 0.6px;">Prompt 2: JD Analysis Prompt</div>
+                <div style="font-size: 12px; font-weight: 700; color: #f39c12; text-transform: uppercase; letter-spacing: 0.6px;">Prompt 2: JD Analysis</div>
                 <button onclick="copyPrompt('jd')" style="padding: 4px 10px; font-size: 11px; background: var(--color-background-primary); color: var(--color-text-primary); border: 1px solid var(--color-border-primary); border-radius: 4px; cursor: pointer;">Copy</button>
               </div>
-              <div style="font-size: 11px; color: var(--color-text-secondary); margin-bottom: 8px;">Use this as your second message for every role you want analyzed. Paste the job posting below it.</div>
-              <textarea id="jai-prompt-jd" class="form-control" style="min-height: 120px; font-size: 11px; font-family: monospace; resize: vertical;" readonly></textarea>
-              <div id="jai-copy-jd-status" style="font-size: 11px; margin-top: 4px; color: var(--color-text-success);"></div>
+              <div style="font-size: 11px; color: var(--color-text-secondary); margin-bottom: 8px;">Send this as your second message for every role. Paste the job posting below it.</div>
+              <textarea id="jai-prompt-jd" class="form-control" style="min-height: 100px; font-size: 11px; font-family: monospace; resize: vertical;" readonly></textarea>
+              <div id="jai-copy-jd-status" style="font-size: 11px; margin-top: 4px; color: var(--color-text-success); min-height: 14px;"></div>
             </div>
 
           </div>
         </div>
 
-        <!-- Hidden file input for restore/import -->
+        <!-- Hidden file inputs -->
         <input type="file" id="jai-file-input" accept=".json" style="display:none;" onchange="handleJobAIFile(event)">
 
       </div>
@@ -6834,6 +6882,10 @@ function exportData() {
       contacts: warmLeadsContacts,
       governance: governanceItems,
       starStories: starStories,
+      jobAI: JSON.parse(localStorage.getItem('jobai-data') || '{}'),
+      jobAISkipRules: JSON.parse(localStorage.getItem('jobai-skiprules') || '[]'),
+      jobAIGovRules: localStorage.getItem('jobai-govrules') || '',
+      jobAISteps: JSON.parse(localStorage.getItem('jobai-steps') || '[]'),
       exportDate: new Date().toISOString(),
       version: 'Job Pipeline v1.0'
     };
@@ -7092,6 +7144,11 @@ function handleJSONFileSelect(event) {
         localStorage.setItem('additional-docs', JSON.stringify(additionalDocs));
         if (document.getElementById('document-list')) renderDocumentList();
       }
+      
+      if (data.jobAI)          localStorage.setItem('jobai-data',      JSON.stringify(data.jobAI));
+      if (Array.isArray(data.jobAISkipRules)) localStorage.setItem('jobai-skiprules', JSON.stringify(data.jobAISkipRules));
+      if (typeof data.jobAIGovRules === 'string') localStorage.setItem('jobai-govrules', data.jobAIGovRules);
+      if (Array.isArray(data.jobAISteps)) localStorage.setItem('jobai-steps', JSON.stringify(data.jobAISteps));
       
       alert('✓ Data imported successfully!');
       
@@ -9110,6 +9167,10 @@ async function syncODLoad() {
         localStorage.setItem('governance-items', JSON.stringify(governanceItems));
         localStorage.setItem('additional-docs',  JSON.stringify(additionalDocs));
         localStorage.setItem('interview-prep',   JSON.stringify(interviewPrep));
+        if (data.jobAI)          localStorage.setItem('jobai-data',      JSON.stringify(data.jobAI));
+        if (Array.isArray(data.jobAISkipRules)) localStorage.setItem('jobai-skiprules', JSON.stringify(data.jobAISkipRules));
+        if (typeof data.jobAIGovRules === 'string') localStorage.setItem('jobai-govrules', data.jobAIGovRules);
+        if (Array.isArray(data.jobAISteps)) localStorage.setItem('jobai-steps', JSON.stringify(data.jobAISteps));
         renderList();
         calculateConversionMetrics();
         syncSetStatus('#27ae60', 'Loaded from OneDrive — data up to date', 'Reconnect', true);
@@ -9140,12 +9201,15 @@ async function syncODLoad() {
 // ============================================================================
 
 let jobAIData = {
-  name: '', level: '', specialty: '', comp: '', location: '',
-  workmodel: 'any', strengths: '', skipRules: [], aiTarget: 'claude'
+  level: '', specialty: '', comp: '', location: '',
+  workmodel: 'any', strengths: '', aiTarget: 'claude'
 };
 
 const JOB_AI_FEATURE_KEY = 'JobAI2026';
 const JOB_AI_STORAGE_KEY = 'jobai-data';
+const SKIP_RULES_KEY     = 'jobai-skiprules';
+const GOV_RULES_KEY      = 'jobai-govrules';
+const ANALYSIS_STEPS_KEY = 'jobai-steps';
 
 // ── Feature Key ───────────────────────────────────────────────────────────────
 function checkFeatureKey() {
@@ -9171,20 +9235,15 @@ function showJobAITab(show) {
 }
 
 function initJobAIUnlock() {
-  if (localStorage.getItem('jobai-unlocked') === '1') {
-    showJobAITab(true);
-  }
+  showJobAITab(true); // Always visible — feature lock deactivated
 }
 
 // ── Load / Save ───────────────────────────────────────────────────────────────
 function loadJobAI() {
   const stored = localStorage.getItem(JOB_AI_STORAGE_KEY);
-  if (stored) {
-    try { jobAIData = JSON.parse(stored); } catch(e) { jobAIData = {}; }
-  }
+  if (stored) { try { jobAIData = JSON.parse(stored); } catch(e) { jobAIData = {}; } }
   const s = jobAIData;
   const set = (id, val) => { const el = document.getElementById(id); if (el) el.value = val || ''; };
-  set('jai-name', s.name);
   set('jai-level', s.level);
   set('jai-specialty', s.specialty);
   set('jai-comp', s.comp);
@@ -9193,26 +9252,21 @@ function loadJobAI() {
   const wm = document.getElementById('jai-workmodel');
   if (wm) wm.value = s.workmodel || 'any';
   selectAITarget(s.aiTarget || 'claude');
-  renderSkipRules(s.skipRules || []);
-  if (s.promptSetup) document.getElementById('jai-prompt-setup').value = s.promptSetup;
-  if (s.promptJD) document.getElementById('jai-prompt-jd').value = s.promptJD;
+  initSkipRules();
+  initGovRules();
+  initAnalysisSteps();
+  if (s.promptSetup) { const el = document.getElementById('jai-prompt-setup'); if (el) el.value = s.promptSetup; }
+  if (s.promptJD)    { const el = document.getElementById('jai-prompt-jd');    if (el) el.value = s.promptJD;    }
 }
 
 function collectJobAIFields() {
   const get = id => { const el = document.getElementById(id); return el ? el.value.trim() : ''; };
-  const rules = JSON.parse(document.getElementById('jai-skiprules-data').value || '[]');
   return {
-    name: get('jai-name'),
-    level: get('jai-level'),
-    specialty: get('jai-specialty'),
-    comp: get('jai-comp'),
-    location: get('jai-location'),
-    workmodel: get('jai-workmodel'),
-    strengths: get('jai-strengths'),
-    skipRules: rules,
+    level: get('jai-level'), specialty: get('jai-specialty'),
+    comp: get('jai-comp'), location: get('jai-location'),
+    workmodel: get('jai-workmodel'), strengths: get('jai-strengths'),
     aiTarget: get('jai-target'),
-    promptSetup: get('jai-prompt-setup'),
-    promptJD: get('jai-prompt-jd'),
+    promptSetup: get('jai-prompt-setup'), promptJD: get('jai-prompt-jd'),
     savedAt: new Date().toISOString()
   };
 }
@@ -9220,99 +9274,215 @@ function collectJobAIFields() {
 function saveJobAI() {
   jobAIData = collectJobAIFields();
   localStorage.setItem(JOB_AI_STORAGE_KEY, JSON.stringify(jobAIData));
+  saveSkipRules(true); saveGovRules(true); saveAnalysisSteps(true);
   const status = document.getElementById('jobai-save-status');
-  if (status) {
-    status.textContent = 'Saved.';
-    setTimeout(() => status.textContent = '', 2000);
-  }
+  if (status) { status.textContent = 'All sections saved.'; setTimeout(() => status.textContent = '', 2500); }
 }
 
-// ── Backup / Restore / Import ─────────────────────────────────────────────────
 function backupJobAI() {
   jobAIData = collectJobAIFields();
-  const blob = new Blob([JSON.stringify(jobAIData, null, 2)], { type: 'application/json' });
+  const rules = JSON.parse(document.getElementById('jai-skiprules-data').value || '[]');
+  const govRules = (document.getElementById('jai-govrules') || {}).value || '';
+  const steps = JSON.parse(document.getElementById('jai-steps-data').value || '[]');
+  const blob = new Blob([JSON.stringify({
+    ...jobAIData, skipRules: rules, govRules, analysisSteps: steps,
+    exportedAt: new Date().toISOString(), dataType: 'jobai'
+  }, null, 2)], { type: 'application/json' });
   const a = document.createElement('a');
-  a.href = URL.createObjectURL(blob);
-  a.download = 'jobai-data-' + new Date().toISOString().slice(0,10) + '.json';
-  a.click();
+  a.href = URL.createObjectURL(blob); a.download = 'jobai-data-' + new Date().toISOString().slice(0,10) + '.json'; a.click();
 }
 
-function restoreJobAI() {
-  const input = document.getElementById('jai-file-input');
-  input.dataset.mode = 'restore';
-  input.click();
-}
-
-function importJobAI() {
-  const input = document.getElementById('jai-file-input');
-  input.dataset.mode = 'import';
-  input.click();
-}
+function restoreJobAI() { document.getElementById('jai-file-input').click(); }
+function importJobAI()  { document.getElementById('jai-file-input').click(); }
 
 function handleJobAIFile(event) {
-  const file = event.target.files[0];
-  if (!file) return;
+  const file = event.target.files[0]; if (!file) return;
   const reader = new FileReader();
-  reader.onload = function(e) {
+  reader.onload = e => {
     try {
       const data = JSON.parse(e.target.result);
-      const mode = document.getElementById('jai-file-input').dataset.mode;
-      if (mode === 'restore') {
-        if (!confirm('This will replace your current Job AI configuration. Proceed?')) return;
-        jobAIData = data;
-        localStorage.setItem(JOB_AI_STORAGE_KEY, JSON.stringify(jobAIData));
-        loadJobAI();
-        const status = document.getElementById('jobai-save-status');
-        if (status) { status.textContent = 'Restored from file.'; setTimeout(() => status.textContent = '', 3000); }
-      } else {
-        // Import: merge skip rules, overwrite profile fields
-        if (data.skipRules && Array.isArray(data.skipRules)) {
-          const current = JSON.parse(document.getElementById('jai-skiprules-data').value || '[]');
-          const merged = [...current, ...data.skipRules.filter(r => !current.find(c => c.rule === r.rule))];
-          renderSkipRules(merged);
-        }
-        const status = document.getElementById('jobai-save-status');
-        if (status) { status.textContent = 'Imported. Review and save.'; setTimeout(() => status.textContent = '', 3000); }
-      }
-    } catch(err) {
-      alert('Could not read file. Make sure it is a valid jobai-data.json.');
-    }
+      jobAIData = data; localStorage.setItem(JOB_AI_STORAGE_KEY, JSON.stringify(jobAIData));
+      if (Array.isArray(data.skipRules)) localStorage.setItem(SKIP_RULES_KEY, JSON.stringify(data.skipRules));
+      if (typeof data.govRules === 'string') localStorage.setItem(GOV_RULES_KEY, data.govRules);
+      if (Array.isArray(data.analysisSteps)) localStorage.setItem(ANALYSIS_STEPS_KEY, JSON.stringify(data.analysisSteps));
+      loadJobAI();
+      const status = document.getElementById('jobai-save-status');
+      if (status) { status.textContent = 'Restored from file.'; setTimeout(() => status.textContent = '', 2500); }
+    } catch(err) { alert('Could not read file. Make sure it is a valid jobai-data.json.'); }
     event.target.value = '';
   };
   reader.readAsText(file);
 }
 
-// ── Auto-Skip Rules ───────────────────────────────────────────────────────────
+// ── Auto-Skip Rules (Chip UI) ─────────────────────────────────────────────────
 function renderSkipRules(rules) {
-  const list = document.getElementById('jai-skiprules-list');
+  const chips = document.getElementById('jai-skiprules-chips');
   const dataInput = document.getElementById('jai-skiprules-data');
-  if (!list) return;
+  if (!chips) return;
   dataInput.value = JSON.stringify(rules);
   if (rules.length === 0) {
-    list.innerHTML = '<div style="font-size: 11px; color: var(--color-text-secondary); padding: 8px 0;">No rules added yet. Click + Add Rule to begin.</div>';
+    chips.innerHTML = '<span style="font-size:11px;color:var(--color-text-secondary);">No rules yet. Type one above and click + Add.</span>';
     return;
   }
-  list.innerHTML = rules.map((r, i) => `
-    <div style="display: flex; align-items: center; gap: 6px; background: var(--color-background-primary); border-radius: 4px; padding: 6px 8px; border: 1px solid var(--color-border-primary);">
-      <span style="font-size: 10px; color: #e74c3c; font-weight: 700; min-width: 14px;">X</span>
-      <span style="flex: 1; font-size: 12px;">${r.rule}</span>
-      <button onclick="removeSkipRule(${i})" style="background: none; border: none; color: var(--color-text-secondary); cursor: pointer; font-size: 14px; padding: 0 4px;">x</button>
-    </div>
-  `).join('');
+  chips.innerHTML = rules.map((r, i) => `
+    <span onclick="removeSkipRule(${i})" title="Click to remove" style="display:inline-flex;align-items:center;gap:4px;background:rgba(231,76,60,0.12);border:1px solid rgba(231,76,60,0.35);color:#e74c3c;border-radius:20px;padding:3px 10px 3px 8px;font-size:11px;cursor:pointer;user-select:none;">
+      <span style="font-size:10px;font-weight:700;opacity:0.8;">✕</span>${r.rule}
+    </span>`).join('');
 }
-
 function addSkipRule() {
-  const rule = prompt('Enter auto-skip rule (e.g. "No salary listed", "Big 4 consulting firms"):');
-  if (!rule || !rule.trim()) return;
+  const input = document.getElementById('jai-skiprule-input');
+  if (!input || !input.value.trim()) return;
   const current = JSON.parse(document.getElementById('jai-skiprules-data').value || '[]');
-  current.push({ rule: rule.trim() });
-  renderSkipRules(current);
+  current.push({ rule: input.value.trim() }); input.value = ''; renderSkipRules(current);
 }
-
 function removeSkipRule(index) {
   const current = JSON.parse(document.getElementById('jai-skiprules-data').value || '[]');
-  current.splice(index, 1);
-  renderSkipRules(current);
+  current.splice(index, 1); renderSkipRules(current);
+}
+function saveSkipRules(silent) {
+  const rules = JSON.parse(document.getElementById('jai-skiprules-data').value || '[]');
+  localStorage.setItem(SKIP_RULES_KEY, JSON.stringify(rules));
+  if (!silent) { const s = document.getElementById('jai-skiprules-status'); if (s) { s.textContent = 'Rules saved.'; setTimeout(() => s.textContent = '', 2000); } }
+}
+function backupSkipRules() {
+  const rules = JSON.parse(document.getElementById('jai-skiprules-data').value || '[]');
+  const blob = new Blob([JSON.stringify({ skipRules: rules, savedAt: new Date().toISOString() }, null, 2)], { type: 'application/json' });
+  const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = 'jobai-skiprules-' + new Date().toISOString().slice(0,10) + '.json'; a.click();
+}
+function restoreSkipRules() { document.getElementById('jai-skiprules-file').click(); }
+function handleSkipRulesFile(event) {
+  const file = event.target.files[0]; if (!file) return;
+  const reader = new FileReader();
+  reader.onload = e => {
+    try {
+      const data = JSON.parse(e.target.result); const rules = data.skipRules || data;
+      if (Array.isArray(rules)) { renderSkipRules(rules); localStorage.setItem(SKIP_RULES_KEY, JSON.stringify(rules)); const s = document.getElementById('jai-skiprules-status'); if (s) { s.textContent = 'Restored.'; setTimeout(() => s.textContent = '', 2000); } }
+      else alert('Invalid file format.');
+    } catch(err) { alert('Could not read file.'); } event.target.value = '';
+  }; reader.readAsText(file);
+}
+function initSkipRules() {
+  const stored = localStorage.getItem(SKIP_RULES_KEY);
+  renderSkipRules(stored ? JSON.parse(stored) : []);
+}
+
+// ── Governance Rules ──────────────────────────────────────────────────────────
+function saveGovRules(silent) {
+  const val = (document.getElementById('jai-govrules') || {}).value || '';
+  localStorage.setItem(GOV_RULES_KEY, val);
+  if (!silent) { const s = document.getElementById('jai-govrules-status'); if (s) { s.textContent = 'Governance rules saved.'; setTimeout(() => s.textContent = '', 2000); } }
+}
+function backupGovRules() {
+  const val = (document.getElementById('jai-govrules') || {}).value || '';
+  const blob = new Blob([JSON.stringify({ govRules: val, savedAt: new Date().toISOString() }, null, 2)], { type: 'application/json' });
+  const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = 'jobai-govrules-' + new Date().toISOString().slice(0,10) + '.json'; a.click();
+}
+function restoreGovRules() { document.getElementById('jai-govrules-file').click(); }
+function handleGovRulesFile(event) {
+  const file = event.target.files[0]; if (!file) return;
+  const reader = new FileReader();
+  reader.onload = e => {
+    try {
+      const data = JSON.parse(e.target.result); const val = typeof data.govRules === 'string' ? data.govRules : '';
+      const el = document.getElementById('jai-govrules'); if (el) el.value = val;
+      localStorage.setItem(GOV_RULES_KEY, val);
+      const s = document.getElementById('jai-govrules-status'); if (s) { s.textContent = 'Restored.'; setTimeout(() => s.textContent = '', 2000); }
+    } catch(err) { alert('Could not read file.'); } event.target.value = '';
+  }; reader.readAsText(file);
+}
+function initGovRules() {
+  const stored = localStorage.getItem(GOV_RULES_KEY);
+  const el = document.getElementById('jai-govrules'); if (el) el.value = stored || '';
+}
+
+// ── Analysis Steps (draggable card list) ──────────────────────────────────────
+let _dragSrcIdx = null;
+
+const DEFAULT_ANALYSIS_STEPS = [
+  'Run all auto-skip rules. If any fire, return SKIP with the specific rule matched and stop.',
+  'Assess role level — Manager vs. Senior Manager vs. Director. Flag if the level is below target.',
+  'Assess specialty and career track — COO delivery vs. CIO infrastructure.',
+  'Run consulting lane check if the firm is a consulting or professional services organization.',
+  'If the role is a contract, calculate annual equivalent (hourly rate x 2080) and compare against the permanent compensation floor.',
+  'Recommend the best resume variant from the attached files with rationale. State whether to use as-is (80%+ keyword match), light customization (70-80%), or heavy customization (below 70%).',
+  'Interview Question Test. Identify the top two or three questions a hiring manager would ask that the candidate cannot answer with high confidence. State each question and the specific gap it exposes.',
+  'Identify the top three critical gaps between the job description requirements and the candidate profile.',
+  'ATS and iCIMS scoring. Produce the formal tree-format scoring breakdown for all roles scoring 7.0 or above.',
+  'Confidence Score. Rate 0 to 10 with a two-line breakdown. Minimum threshold for APPLY is 6.5.',
+  'Expert Panel Assessment for all roles scoring 7.0 or above. Senior Technical Recruiter, Director of HR, and Technical Hiring Manager each assess: advantage, where fit is thin, one concrete recommendation. Close with consensus paragraph on organizational fit and positioning angle.',
+  'Final Verdict: Apply, Store for Review, or Skip with full rationale.'
+];
+
+function escHtml(str) {
+  return str.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+function getSteps() { return JSON.parse(document.getElementById('jai-steps-data').value || '[]'); }
+
+function renderAnalysisSteps(steps) {
+  const list = document.getElementById('jai-steps-list');
+  const dataInput = document.getElementById('jai-steps-data');
+  if (!list) return;
+  dataInput.value = JSON.stringify(steps);
+  if (steps.length === 0) {
+    list.innerHTML = '<div style="font-size:11px;color:var(--color-text-secondary);padding:6px 0;">No steps. Add one below or restore defaults.</div>';
+    return;
+  }
+  list.innerHTML = steps.map((s, i) => `
+    <div draggable="true" ondragstart="stepDragStart(event,${i})" ondragover="stepDragOver(event)" ondrop="stepDrop(event,${i})"
+         style="display:flex;align-items:flex-start;gap:6px;background:var(--color-background-primary);border:1px solid var(--color-border-tertiary);border-radius:6px;padding:6px 8px;cursor:grab;transition:opacity 0.15s;">
+      <span style="font-size:10px;color:#8e44ad;font-weight:700;min-width:16px;padding-top:2px;">☰</span>
+      <span style="font-size:11px;color:#8e44ad;font-weight:700;min-width:14px;padding-top:2px;">${i+1}</span>
+      <span style="flex:1;font-size:11px;line-height:1.4;" onclick="editStep(${i})" title="Click to edit">${escHtml(s)}</span>
+      <button onclick="removeAnalysisStep(${i})" style="background:none;border:none;color:var(--color-text-secondary);cursor:pointer;font-size:12px;padding:0 2px;flex-shrink:0;" title="Remove">✕</button>
+    </div>`).join('');
+}
+function addAnalysisStep() {
+  const input = document.getElementById('jai-step-input');
+  if (!input || !input.value.trim()) return;
+  const steps = getSteps(); steps.push(input.value.trim()); input.value = ''; renderAnalysisSteps(steps);
+}
+function removeAnalysisStep(index) {
+  const steps = getSteps(); steps.splice(index, 1); renderAnalysisSteps(steps);
+}
+function editStep(index) {
+  const steps = getSteps();
+  const newVal = prompt('Edit step:', steps[index]);
+  if (newVal === null) return;
+  steps[index] = newVal.trim() || steps[index]; renderAnalysisSteps(steps);
+}
+function stepDragStart(e, idx) { _dragSrcIdx = idx; e.dataTransfer.effectAllowed = 'move'; }
+function stepDragOver(e) { e.preventDefault(); e.dataTransfer.dropEffect = 'move'; }
+function stepDrop(e, idx) {
+  e.preventDefault(); if (_dragSrcIdx === null || _dragSrcIdx === idx) return;
+  const steps = getSteps(); const moved = steps.splice(_dragSrcIdx, 1)[0]; steps.splice(idx, 0, moved);
+  _dragSrcIdx = null; renderAnalysisSteps(steps);
+}
+function saveAnalysisSteps(silent) {
+  const steps = getSteps();
+  if (!silent && !confirm('Saving will overwrite the previously saved Analysis Steps. Continue?')) return;
+  localStorage.setItem(ANALYSIS_STEPS_KEY, JSON.stringify(steps));
+  if (!silent) { const s = document.getElementById('jai-steps-status'); if (s) { s.textContent = 'Steps saved.'; setTimeout(() => s.textContent = '', 2000); } }
+}
+function backupAnalysisSteps() {
+  const steps = getSteps();
+  const blob = new Blob([JSON.stringify({ analysisSteps: steps, savedAt: new Date().toISOString() }, null, 2)], { type: 'application/json' });
+  const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = 'jobai-steps-' + new Date().toISOString().slice(0,10) + '.json'; a.click();
+}
+function restoreAnalysisSteps() { document.getElementById('jai-steps-file').click(); }
+function handleAnalysisStepsFile(event) {
+  const file = event.target.files[0]; if (!file) return;
+  const reader = new FileReader();
+  reader.onload = e => {
+    try {
+      const data = JSON.parse(e.target.result); const steps = data.analysisSteps || data;
+      if (Array.isArray(steps)) { renderAnalysisSteps(steps); localStorage.setItem(ANALYSIS_STEPS_KEY, JSON.stringify(steps)); const s = document.getElementById('jai-steps-status'); if (s) { s.textContent = 'Restored.'; setTimeout(() => s.textContent = '', 2000); } }
+      else alert('Invalid file format.');
+    } catch(err) { alert('Could not read file.'); } event.target.value = '';
+  }; reader.readAsText(file);
+}
+function initAnalysisSteps() {
+  const stored = localStorage.getItem(ANALYSIS_STEPS_KEY);
+  renderAnalysisSteps(stored ? JSON.parse(stored) : DEFAULT_ANALYSIS_STEPS);
 }
 
 // ── AI Target Selection ───────────────────────────────────────────────────────
@@ -9322,17 +9492,9 @@ function selectAITarget(target) {
   ['claude','chatgpt'].forEach(t => {
     const el = document.getElementById('jai-target-' + t);
     if (!el) return;
-    if (t === target) {
-      el.style.background = '#0d6efd';
-      el.style.color = 'white';
-      el.style.borderColor = '#0d6efd';
-    } else {
-      el.style.background = 'var(--color-background-primary)';
-      el.style.color = 'var(--color-text-primary)';
-      el.style.borderColor = 'var(--color-border-primary)';
-    }
+    if (t === target) { el.style.background = '#0d6efd'; el.style.color = 'white'; el.style.borderColor = '#0d6efd'; }
+    else { el.style.background = 'var(--color-background-primary)'; el.style.color = 'var(--color-text-primary)'; el.style.borderColor = 'var(--color-border-primary)'; }
   });
-  // Re-generate JD prompt if setup prompt already exists
   const setup = document.getElementById('jai-prompt-setup');
   if (setup && setup.value) generateJobAIPrompts();
 }
@@ -9340,97 +9502,135 @@ function selectAITarget(target) {
 // ── Prompt Generation ─────────────────────────────────────────────────────────
 function generateJobAIPrompts() {
   const get = id => { const el = document.getElementById(id); return el ? el.value.trim() : ''; };
-  const name = get('jai-name') || 'the user';
-  const level = get('jai-level') || 'Senior Manager to Director';
-  const specialty = get('jai-specialty') || 'IT Delivery';
-  const comp = get('jai-comp') || 'not specified';
-  const location = get('jai-location') || 'not specified';
-  const workmodel = get('jai-workmodel') || 'any';
-  const strengths = get('jai-strengths');
-  const target = get('jai-target') || 'claude';
-  const rules = JSON.parse(document.getElementById('jai-skiprules-data').value || '[]');
+  const level      = get('jai-level')    || 'Senior Manager to Director';
+  const specialty  = get('jai-specialty') || 'IT Delivery';
+  const comp       = get('jai-comp')     || 'not specified';
+  const location   = get('jai-location') || 'not specified';
+  const workmodel  = get('jai-workmodel') || 'any';
+  const strengths  = get('jai-strengths');
+  const target     = get('jai-target')   || 'claude';
+  const skipRules  = JSON.parse(document.getElementById('jai-skiprules-data').value || '[]');
+  const govRules   = (document.getElementById('jai-govrules') || {}).value || '';
+  const steps      = getSteps();
 
-  const strengthLines = strengths ? strengths.split('\n').filter(s => s.trim()).map(s => '- ' + s.trim()).join('\n') : '- Not specified';
-  const skipLines = rules.length > 0 ? rules.map(r => '- ' + r.rule).join('\n') : '- None defined';
+  const strengthLines = strengths
+    ? strengths.split('\n').filter(s => s.trim()).map(s => '- ' + s.trim()).join('\n')
+    : '- Not specified';
 
-  const workmodelText = {
-    any: 'open to remote, hybrid, or on-site',
-    remote: 'strong preference for remote',
-    hybrid: 'preference for hybrid',
-    onsite: 'on-site acceptable'
-  }[workmodel] || 'any';
+  const userSkipLines = skipRules.length > 0
+    ? skipRules.map(r => '- ' + r.rule).join('\n')
+    : '- None defined';
 
-  const aiName = target === 'chatgpt' ? 'ChatGPT' : 'Claude';
+  const workmodelText = { any: 'open to remote, hybrid, or on-site', remote: 'strong preference for remote', hybrid: 'preference for hybrid', onsite: 'on-site acceptable' }[workmodel] || 'any';
+
   const persistNote = target === 'chatgpt'
-    ? 'For persistent setup: paste this into Settings > Custom Instructions in ChatGPT.'
-    : 'For persistent setup: paste this into a Claude Project or use as your opening message each session.';
+    ? 'SETUP NOTE: For persistent context, paste this into Settings > Custom Instructions in ChatGPT. Attach your resume files to your first message in each new session.'
+    : 'SETUP NOTE: For persistent context, add this to a Claude Project. Attach your resume files to your first message in each new session.';
 
-  const setupPrompt = `You are a senior career strategy advisor and job fit analyst.
+  const govSection = govRules.trim()
+    ? `\nGOVERNANCE RULES\nApply the following proprietary frameworks and scoring models during every analysis:\n${govRules.trim()}\n`
+    : '';
+
+  const stepsSection = steps.length > 0
+    ? steps.map((s, i) => `${i+1}. ${s}`).join('\n')
+    : '1. Assess role fit and return a verdict.';
+
+  const setupPrompt = `You are a senior career strategy advisor and job fit analyst. You hold three roles simultaneously: Senior Technical Recruiter (ATS keyword match, recruiter first-impression read, 8-second scan assessment), Director of Human Resources (positioning consistency, title and level alignment, cultural fit signals, presentation risks), and Technical Hiring Manager (technical credibility of claims, depth defensibility two levels down, scope accuracy, specific organizational benefit). Assess job postings against the candidate profile below and return structured verdicts covering resume recommendations, ATS and iCIMS scoring, confidence scores, gap analysis, and expert panel consensus.
 
 CANDIDATE PROFILE
-Name: ${name}
 Target Level: ${level}
 Specialty: ${specialty}
-Compensation Floor: ${comp} base (non-negotiable)
+Compensation Floor: ${comp} base for permanent internal employer roles. For eligible consulting and professional services firms, the floor is lower — state if applicable. Contract roles: calculate hourly rate x 2080 for annual equivalent before comparing.
 Location: ${location}
 Work Model: ${workmodelText}
 
 CORE STRENGTHS
 ${strengthLines}
 
-AUTO-SKIP RULES (enforce before any analysis)
-The following trigger an immediate skip verdict. No exceptions:
-${skipLines}
-
+CAREER TRACK
+This candidate is on the COO delivery track, not the CIO infrastructure track. COO track means Platform Implementation Delivery: ServiceNow, Maximo, Oracle Fusion, ITSM platform ownership, release and cutover leadership, governance framework implementation, CAB Chair leadership, technical program management. CIO track means: data center operations, server and storage management, helpdesk operations, network management, cybersecurity leadership, IT strategy formulation, enterprise architecture policy, business continuity and disaster recovery. Skip any role that is primarily CIO track regardless of compensation.
+${govSection}
 RESUME HANDLING
-Before proceeding with any analysis, confirm that one or more resume files have been attached to this message. If no resume is attached, respond only with:
-"No resume detected. Please attach your resume file (PDF, Word, or text) to this message and resend before I can proceed."
+Before any analysis, confirm that one or more resume files are attached to this message. If no resume is attached, respond only with: "No resume detected. Please attach your resume file or files and resend. I cannot proceed without them."
 
-Once resumes are received, review all attached files. Identify and label each resume variant based on its content, positioning, and target role focus. Do not use pre-defined names. Derive variant labels from what you see in the documents.
+Once resumes are received, review all attached files. Identify and label each variant based on its content, positioning, and target role focus. Derive variant labels from what you read in the documents. Hold these in memory for the full session.
+
+AUTO-SKIP RULES
+Run all auto-skip rules before any analysis. A match returns an immediate SKIP verdict with the specific rule that fired. No further analysis is produced on a SKIP. The only exceptions are documented warm leads or explicit strategic overrides stated by the user.
+
+Standard hard auto-skip triggers:
+- No salary listed
+- Salary below compensation floor with no warm lead or documented exception
+- Management consulting strategy firms (McKinsey, BCG, Bain)
+- Big 4 strategy and advisory arms unless the role is internal IT running ServiceNow delivery or ITSM governance
+- Digital agencies
+- Environmental and engineering professional services firms regardless of role title
+- PROSCI certification listed as required
+- Product Management roles (WHAT and WHY, not HOW and WHEN)
+- Scrum Master or Agile Coach facilitation roles
+- Software Engineering Management
+- ERP or Supply Chain specialty (SAP functional, Oracle ERP functional)
+- eCommerce platform roles
+- IT Infrastructure Operations (data center, server, storage, helpdesk)
+- DevOps Platform Engineering technical specialist roles
+- CIO track roles: IT strategy formulation, cybersecurity leadership, business continuity, enterprise architecture policy
+
+Consulting lane check: confirm the role leads ServiceNow delivery, Release Management, or ITSM governance. Skip advisory, strategy, or domain-unrelated arms.
+
+User-defined additional rules:
+${userSkipLines}
 
 ANALYSIS FRAMEWORK
-For each job description I send you:
-1. Run auto-skip rules first. If any trigger, return: SKIP with the rule that fired.
-2. Assess role level, specialty, and location fit.
-3. Recommend the best resume variant from the attached files.
-4. Identify the top three critical gaps.
-5. Provide a confidence score from 0 to 10 with a one-line breakdown.
-6. Return a clear verdict: APPLY, STORE FOR REVIEW, or SKIP with rationale.
+For each job description received, execute all steps in sequence:
+${stepsSection}
 
 OUTPUT FORMAT
-Verdict: [APPLY / STORE / SKIP]
-Resume Variant: [label from attached resumes]
-Confidence: [X.X / 10] — [one line reason]
+Verdict: APPLY / STORE FOR REVIEW / SKIP
+Resume Variant: [label from attached resumes] — [as-is / light customization / heavy customization]
+Confidence: [X.X / 10] — [two-line breakdown]
+Salary Check: [stated salary vs. floor — pass or flag]
 Top Gaps: [1] [2] [3]
+Interview Question Test: [Q1 — gap exposed] [Q2 — gap exposed]
+
+ATS Score: [X]/100
+iCIMS Score: [X]/100
+
+Expert Panel:
+  Recruiter: [advantage / thin fit / recommendation]
+  HR Director: [advantage / thin fit / recommendation]
+  Hiring Manager: [advantage / thin fit / recommendation]
+  Consensus: [one paragraph]
+
 Rationale: [2 to 3 sentences]
 
 WAIT INSTRUCTION
-Do not begin any job description analysis until you confirm resumes are loaded. After confirming, wait for my next message which will contain the job description.
+After confirming resumes are loaded, wait for the next message. Do not begin analysis until a job description arrives.
 
 ${persistNote}`;
 
   const jdPrompt = `Analyze this role using my profile and the resume variants you have loaded.
 
-[Paste the full job description below this line]`;
+Provide the job description using either method:
+- Attach the JD as a file to this message, OR
+- Paste the full job posting text below this line`;
 
   const setupEl = document.getElementById('jai-prompt-setup');
-  const jdEl = document.getElementById('jai-prompt-jd');
+  const jdEl    = document.getElementById('jai-prompt-jd');
   if (setupEl) setupEl.value = setupPrompt;
-  if (jdEl) jdEl.value = jdPrompt;
+  if (jdEl)    jdEl.value    = jdPrompt;
 
-  // Auto-save generated prompts
   jobAIData = collectJobAIFields();
   jobAIData.promptSetup = setupPrompt;
-  jobAIData.promptJD = jdPrompt;
+  jobAIData.promptJD    = jdPrompt;
   localStorage.setItem(JOB_AI_STORAGE_KEY, JSON.stringify(jobAIData));
 }
 
 // ── Copy Prompt ───────────────────────────────────────────────────────────────
 function copyPrompt(which) {
-  const id = which === 'setup' ? 'jai-prompt-setup' : 'jai-prompt-jd';
+  const id       = which === 'setup' ? 'jai-prompt-setup' : 'jai-prompt-jd';
   const statusId = which === 'setup' ? 'jai-copy-setup-status' : 'jai-copy-jd-status';
-  const el = document.getElementById(id);
-  const status = document.getElementById(statusId);
+  const el       = document.getElementById(id);
+  const status   = document.getElementById(statusId);
   if (!el || !el.value) {
     if (status) { status.textContent = 'Generate the prompt first.'; setTimeout(() => status.textContent = '', 2000); }
     return;
@@ -9438,14 +9638,13 @@ function copyPrompt(which) {
   navigator.clipboard.writeText(el.value).then(() => {
     if (status) { status.textContent = 'Copied to clipboard.'; setTimeout(() => status.textContent = '', 2000); }
   }).catch(() => {
-    el.select();
-    document.execCommand('copy');
+    el.select(); document.execCommand('copy');
     if (status) { status.textContent = 'Copied.'; setTimeout(() => status.textContent = '', 2000); }
   });
 }
 
 // ── Init on DOMContentLoaded ──────────────────────────────────────────────────
-window.addEventListener('DOMContentLoaded', initJobAIUnlock);
+window.addEventListener('DOMContentLoaded', () => { initJobAIUnlock(); initSkipRules(); initGovRules(); initAnalysisSteps(); });
 
 // ============================================================================
 // END JOB AI
@@ -9461,7 +9660,11 @@ function syncBuildPayload() {
     governanceItems: governanceItems,
     additionalDocs: additionalDocs,
     interviewPrep: interviewPrep,
-    profile: profileData
+    profile: profileData,
+    jobAI: JSON.parse(localStorage.getItem('jobai-data') || '{}'),
+    jobAISkipRules: JSON.parse(localStorage.getItem('jobai-skiprules') || '[]'),
+    jobAIGovRules: localStorage.getItem('jobai-govrules') || '',
+    jobAISteps: JSON.parse(localStorage.getItem('jobai-steps') || '[]')
   }, null, 2);
 }
 
@@ -9582,6 +9785,10 @@ async function syncLoad() {
         localStorage.setItem('governance-items', JSON.stringify(governanceItems));
         localStorage.setItem('additional-docs',  JSON.stringify(additionalDocs));
         localStorage.setItem('interview-prep',   JSON.stringify(interviewPrep));
+        if (data.jobAI)          localStorage.setItem('jobai-data',      JSON.stringify(data.jobAI));
+        if (Array.isArray(data.jobAISkipRules)) localStorage.setItem('jobai-skiprules', JSON.stringify(data.jobAISkipRules));
+        if (typeof data.jobAIGovRules === 'string') localStorage.setItem('jobai-govrules', data.jobAIGovRules);
+        if (Array.isArray(data.jobAISteps)) localStorage.setItem('jobai-steps', JSON.stringify(data.jobAISteps));
         renderList();
         calculateConversionMetrics();
         syncSetStatus('#27ae60', 'Loaded from Drive — data up to date', 'Reconnect', true);
