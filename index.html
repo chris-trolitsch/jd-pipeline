@@ -3,8 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta name="darkreader-lock">
-<title>Chris Trolitsch Job Pipeline Dashboard V8</title>
+<title>Architecting Predictability: The Job Suite</title>
 <script src="https://accounts.google.com/gsi/client" async defer></script>
 <script src="https://alcdn.msauth.net/browser/2.38.3/js/msal-browser.min.js" async defer></script>
 <style>
@@ -32,7 +31,7 @@
     --color-background-secondary: #2d2d2d;
     --color-background-info: #1a3a42;
     --color-background-success: #1a3a28;
-    --color-background-warning: #2d2700;
+    --color-background-warning: #3d3520;
     --color-background-danger: #3d1f25;
     --color-text-primary: #e0e0e0;
     --color-text-secondary: #a0a0a0;
@@ -226,91 +225,8 @@ input, select, textarea {
   color: var(--color-text-success);
 }
 
-.badge-interview {
-  background: rgba(102, 16, 242, 0.15);
-  color: #a370f7;
-  border: 1px solid rgba(102, 16, 242, 0.4);
-  font-weight: 700;
-}
-
-.badge-offered {
-  background: rgba(0, 255, 128, 0.15);
-  color: #00ff80;
-  border: 1px solid rgba(0, 255, 128, 0.5);
-  font-weight: 900;
-  text-shadow: 0 0 6px rgba(0, 255, 128, 0.6);
-}
-
-.badge-accepted {
-  background: rgba(0, 255, 128, 0.2);
-  color: #00ff80;
-  border: 1px solid rgba(0, 255, 128, 0.7);
-  font-weight: 900;
-  letter-spacing: 0.3px;
-  text-shadow: 0 0 8px rgba(0, 255, 128, 0.8);
-}
-
-/* Pop-out edit mode */
-#popout-overlay {
-  display: none;
-  position: fixed;
-  inset: 0;
-  background: var(--color-background-primary);
-  z-index: 9999;
-  flex-direction: column;
-}
-#popout-overlay.active {
-  display: flex;
-}
-#popout-header {
-  background: #1e2a3a;
-  color: white;
-  padding: 12px 24px;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  flex-shrink: 0;
-  gap: 16px;
-}
-#popout-header h1 {
-  font-size: 16px;
-  font-weight: 600;
-  margin: 0;
-}
-#popout-header .meta {
-  font-size: 11px;
-  color: #adb5bd;
-  margin-top: 2px;
-}
-#popout-body {
-  flex: 1;
-  overflow-y: auto;
-  padding: 20px 24px;
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 24px;
-  align-items: start;
-}
-@media (max-width: 800px) {
-  #popout-body { grid-template-columns: 1fr; }
-}
-#popout-detail {
-  min-width: 0;
-}
-#popout-save-bar {
-  display: flex;
-  gap: 10px;
-  align-items: center;
-  flex-shrink: 0;
-}
-#popout-status-badge {
-  font-size: 11px;
-  font-weight: 700;
-  padding: 4px 10px;
-  border-radius: 20px;
-  background: rgba(255,255,255,0.15);
-  white-space: nowrap;
-}
+/* Detail Box */
+.detail-box {
   background: var(--color-background-primary);
   border: 0.5px solid var(--color-border-tertiary);
   border-radius: var(--border-radius-lg);
@@ -665,8 +581,8 @@ input, select, textarea {
   <!-- Header -->
   <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem; margin-left: 60px;">
     <h1 id="dashboard-title" style="margin: 0;">
-      Job Pipeline Dashboard for Chris Trolitsch
-      <span style="font-size: 12px; font-weight: normal; color: var(--color-text-info); background: var(--color-background-info); padding: 4px 8px; border-radius: 4px; margin-left: 12px;">V8</span>
+      Architecting Predictability: The Job Suite
+      <span style="font-size: 12px; font-weight: normal; color: var(--color-text-info); background: var(--color-background-info); padding: 4px 8px; border-radius: 4px; margin-left: 12px;">Job Pipeline v1.0</span>
     </h1>
   </div>
   
@@ -1244,11 +1160,11 @@ input, select, textarea {
 
     <div style="max-width: 860px;">
       <div style="background: rgba(13, 110, 253, 0.07); border: 1px solid rgba(13, 110, 253, 0.25); border-radius: 8px; padding: 12px 16px; margin-bottom: 1.25rem; font-size: 12px; color: #0d6efd; line-height: 1.6;">
-        Paste AI-provided output below. The parser reads Company, Role, Status, Next Action, Due Date, Notes, Resume, App Date, Salary, Geography, and Type fields. New records are flagged with a blue (!) badge until you complete entry.
+        Paste a pupdate block or blitz analysis output below. The parser reads Company, Role, Status, Next Action, Due Date, Notes, Resume, App Date, Salary, Geography, and Type fields. New records are flagged with a blue (!) badge until you complete entry.
       </div>
       <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
         <div>
-          <label style="display: block; font-size: 12px; font-weight: 600; margin-bottom: 6px; color: var(--color-text-secondary);">Paste AI-provided output here</label>
+          <label style="display: block; font-size: 12px; font-weight: 600; margin-bottom: 6px; color: var(--color-text-secondary);">Paste blitz / pupdate output here</label>
           <textarea id="admin-import-paste" style="width: 100%; height: 340px; font-family: monospace; font-size: 12px; padding: 10px; border: 1px solid var(--color-border-tertiary); border-radius: 6px; resize: vertical; background: var(--color-background-secondary); color: var(--color-text-primary);" placeholder="Company: Acme Corp&#10;Role: Senior Manager, Release Management&#10;Status: Submitted&#10;Next Action: Follow-up April 10&#10;Due Date: 2026-04-10&#10;Notes: Strong release fit, warm lead via Jordan&#10;Resume: Release_Governance&#10;App Date: 2026-04-05&#10;Salary: $120-140/hr&#10;Geography: Calgary&#10;Type: Contract"></textarea>
           <div style="display: flex; gap: 8px; margin-top: 8px;">
             <button onclick="parseAdminImport()" style="flex: 1; padding: 9px; background: #0d6efd; color: white; border: none; border-radius: 5px; font-size: 13px; font-weight: 600; cursor: pointer;">Parse Input</button>
@@ -3138,27 +3054,19 @@ function saveAppChanges() {
   syncAutoSave();
 
   const statusDiv = document.getElementById('app-save-status');
-  if (statusDiv) {
-    statusDiv.textContent = '✓ Changes saved';
-    setTimeout(() => { if (statusDiv) statusDiv.textContent = ''; }, 2000);
-  }
+  statusDiv.textContent = '✓ Changes saved';
+  setTimeout(() => statusDiv.textContent = '', 2000);
   const now = new Date();
   const lastSavedStr = 'Last saved ' + now.toLocaleTimeString([], {hour: '2-digit', minute: '2-digit'});
   ['app-last-saved', 'app-last-saved-additional', 'popout-last-saved'].forEach(id => {
     const el = document.getElementById(id);
     if (el) el.textContent = lastSavedStr;
   });
-
-  // Pop-out mode: notify parent then reload to reset form state cleanly
-  if (new URLSearchParams(window.location.search).get('popout')) {
-    notifyParentOfSave();
-    sessionStorage.setItem('popout-scroll', window.scrollY);
-    window.location.reload();
-    return;
-  }
-
-  // Main window: re-render list and detail panel
+  
+  // Force re-render of list to update filter visibility
   renderList();
+  
+  // Re-select the app to update the detail view
   selectApp(selectedApp);
 }
 
@@ -4257,12 +4165,11 @@ function saveProfile() {
   setTimeout(() => statusDiv.textContent = '', 2000);
 }
 
-// Update dashboard title with profile name
+// Update dashboard title with brand name
 function updateDashboardTitle() {
   const titleElement = document.getElementById('dashboard-title');
-  const name = profileData.name || 'Chris Trolitsch';
-  titleElement.textContent = `Job Pipeline Dashboard for ${name}`;
-  document.title = `${name} for Job Pipeline Dashboard v2`;
+  titleElement.innerHTML = 'Architecting Predictability: The Job Suite <span style="font-size: 12px; font-weight: normal; color: var(--color-text-info); background: var(--color-background-info); padding: 4px 8px; border-radius: 4px; margin-left: 12px;">Job Pipeline v1.0</span>';
+  document.title = 'Architecting Predictability: The Job Suite';
 }
 
 // Update story type labels throughout UI
@@ -4511,35 +4418,6 @@ function calculatePipelineHealth(app) {
   if (app.status === 'Closed' || app.status === 'Paused') {
     return { level: 'none', color: '', glow: '' };
   }
-
-  // STATUS-PRIORITY GLOWS — override health scoring entirely
-  if (app.status === 'Accepted Offer') {
-    return {
-      level: 'accepted',
-      color: '#00ff80',
-      glow: 'box-shadow: 0 0 28px rgba(0,255,128,0.95), 0 0 8px rgba(0,255,128,0.6); border-color: rgba(0,255,128,0.8);',
-      icon: '🟢',
-      label: 'Accepted'
-    };
-  }
-  if (app.status === 'Offered') {
-    return {
-      level: 'offered',
-      color: '#00ff80',
-      glow: 'box-shadow: 0 0 24px rgba(0,255,128,0.85), 0 0 6px rgba(0,255,128,0.5); border-color: rgba(0,255,128,0.7);',
-      icon: '💚',
-      label: 'Offered'
-    };
-  }
-  if (app.status === 'Interview Stage') {
-    return {
-      level: 'interview',
-      color: '#a370f7',
-      glow: 'box-shadow: 0 0 18px rgba(102,16,242,0.7), 0 0 5px rgba(163,112,247,0.4); border-color: rgba(102,16,242,0.5);',
-      icon: '🟣',
-      label: 'Interview'
-    };
-  }
   
   // Use lastActivityDate (updated on every save) or fallback to appDate
   const lastActivity = app.lastActivityDate || app.appDate;
@@ -4679,12 +4557,10 @@ function renderList() {
       }
     }
     
-    // Apply glow — priority: admin-pending > status glow (Accepted/Offered/Interview) > upcoming interview > health
+    // Apply glow effect: blue for admin-pending, green for interview, otherwise health glow
     if (app.adminPending) {
       card.classList.add('admin-pending');
       card.style.cssText = 'box-shadow: 0 0 14px rgba(13, 110, 253, 0.75); border-color: #0d6efd;';
-    } else if (health.level === 'accepted' || health.level === 'offered' || health.level === 'interview') {
-      card.style.cssText = health.glow;
     } else if (upcomingInterview) {
       card.style.cssText = 'box-shadow: 0 0 12px rgba(40, 167, 69, 0.6);'; // Green glow
     } else if (health.glow) {
@@ -4696,7 +4572,7 @@ function renderList() {
       : '<span class="badge badge-fulltime">FT</span>';
     
     const starBadge = app.confidenceScore >= 9 
-      ? '<div style="margin-top: 4px;"><span style="font-size: 10px; background: rgba(255,193,7,0.15); color: #ffc107; border: 1px solid rgba(255,193,7,0.4); padding: 2px 6px; border-radius: 3px;">⭐ High Confidence</span></div>' 
+      ? '<div style="margin-top: 4px;"><span style="font-size: 10px; background: var(--color-background-warning); color: var(--color-text-warning); padding: 2px 6px; border-radius: 3px;">⭐ High Confidence</span></div>' 
       : '';
     
     // Interview badge (green for upcoming)
@@ -6833,7 +6709,7 @@ function deleteStar() {
   document.getElementById('star-details').innerHTML = '<div style="text-align: center; padding: 3rem; color: var(--color-text-secondary);">Story deleted</div>';
 }
 
-// Export Data (Full Pipeline Refresh)
+// Export Data (Becky's Full Refresh)
 function exportData() {
   try {
     const data = {
@@ -6843,7 +6719,7 @@ function exportData() {
       governance: governanceItems,
       starStories: starStories,
       exportDate: new Date().toISOString(),
-      version: '8.0'
+      version: 'Job Pipeline v1.0'
     };
     const dataStr = JSON.stringify(data, null, 2);
     const dataBlob = new Blob([dataStr], { type: 'application/json' });
@@ -7738,11 +7614,7 @@ function renderContactApplicationHistory() {
     <div style="display: grid; gap: 12px;">
       ${historyApps.map(app => {
         const isActive = app.status !== 'Closed';
-        const statusColor = app.status === 'Accepted Offer' ? '#00ff80'
-          : app.status === 'Offered' ? '#00ff80'
-          : app.status === 'Interview Stage' ? '#a370f7'
-          : isActive ? 'var(--color-text-success)' : 'var(--color-text-secondary)';
-        const statusWeight = (app.status === 'Accepted Offer' || app.status === 'Offered') ? '900' : '500';
+        const statusColor = isActive ? 'var(--color-text-success)' : 'var(--color-text-secondary)';
         
         return `
           <div class="app-card" onclick="viewApplicationFromContact('${app.id}')" style="cursor: pointer; ${!isActive ? 'opacity: 0.6;' : ''}">
@@ -7754,7 +7626,7 @@ function renderContactApplicationHistory() {
             </div>
             <div style="font-size: 12px; color: var(--color-text-secondary); margin-bottom: 8px;">${dm(app.role, 'role')}</div>
             <div style="display: flex; justify-content: space-between; align-items: center; font-size: 11px;">
-              <div style="color: ${statusColor}; font-weight: ${statusWeight};">${app.status}</div>
+              <div style="color: ${statusColor}; font-weight: 500;">${app.status}</div>
               <div style="color: var(--color-text-secondary);">Applied: ${app.appDate}</div>
             </div>
             ${app.confidenceScore ? `<div style="font-size: 10px; color: var(--color-text-warning); margin-top: 4px;">⭐ ${app.confidenceScore}/10</div>` : ''}
@@ -8100,10 +7972,6 @@ if (starStories.length > 0) renderStarList();
 
 // Initialize when DOM is ready
 window.addEventListener('DOMContentLoaded', function() {
-
-  // Pop-out mode: if ?popout=ID is in URL, render edit view and stop
-  if (initPopoutMode()) return;
-
   // Load profile data on initial page load (Profile tab is default active in Data Repository)
   loadProfile();
   
@@ -8168,7 +8036,7 @@ function hideAdminTab() {
 }
 
 // Handle keydown on drawer search input
-// If Enter is pressed with the admin passphrase, reveal admin tab
+// If Enter is pressed and value === 'Remysarus', reveal admin tab
 function handleDrawerSearchKeydown(event) {
   if (event.key !== 'Enter') return;
   const val = document.getElementById('drawer-search').value;
@@ -8187,7 +8055,7 @@ function handleDrawerSearchKeydown(event) {
   // Normal Enter: apply filters
 }
 
-// Parse key:value AI output text into a field object
+// Parse key:value pupdate / blitz text into a field object
 function parseAdminImport() {
   const raw = document.getElementById('admin-import-paste').value.trim();
   if (!raw) {
@@ -8233,7 +8101,7 @@ function parseAdminImport() {
     else if (key === 'confidence' || key === 'confidence score') result.confidenceScore = parseFloat(val) || null;
   });
 
-  // --- Markdown heading fallback: ## Company - Role Title ---
+  // --- Blitz markdown fallback: ## Company - Role Title ---
   if (!result.company) {
     const h2match = raw.match(/^##\s+(.+?)\s+-\s+(.+)/m);
     if (h2match) {
@@ -8622,189 +8490,164 @@ function _applyDemoModeUI() {
 // ============================================================================
 
 function openAppInNewTab(appId) {
-  // Build same-origin URL with popout query param so the new tab
-  // shares localStorage and can save edits back to the pipeline.
-  const base = window.location.href.split('?')[0];
-  const url  = base + '?popout=' + encodeURIComponent(appId);
-  const win  = window.open(url, '_blank');
-  if (!win) {
-    // Pop-up blocked — fallback notice
-    alert('Pop-up blocked. Please allow pop-ups for this site and try again.');
-  }
-}
-
-// ============================================================================
-// POP-OUT EDIT MODE
-// Uses same-origin URL (?popout=ID) so localStorage is shared.
-// BroadcastChannel notifies parent window to re-render after save.
-// ============================================================================
-
-// Notify parent window that an app was saved in the pop-out
-function notifyParentOfSave() {
-  try {
-    const bc = new BroadcastChannel('jd-pipeline-sync');
-    bc.postMessage({ type: 'popout-saved', appId: selectedApp ? selectedApp.id : null });
-    bc.close();
-  } catch(e) {
-    // BroadcastChannel not available — parent will pick up on next focus
-  }
-  // Show save confirmation in pop-out header
-  const msg = document.getElementById('popout-save-msg');
-  if (msg) {
-    msg.textContent = '✓ Saved';
-    setTimeout(() => { msg.textContent = ''; }, 2500);
-  }
-}
-
-// Initialize pop-out mode when ?popout=ID is in the URL
-function initPopoutMode() {
-  const params = new URLSearchParams(window.location.search);
-  const appId  = params.get('popout');
-  if (!appId) return false;
-
-  // Hide main UI: header, tabs, all tab content, hamburger, drawer
-  const hideIds = [
-    'hamburger-menu', 'admin-drawer', 'demo-mode-banner',
-    'main-tab-content-pipeline', 'main-tab-content-tasks',
-    'main-tab-content-contacts', 'main-tab-content-repo',
-    'main-tab-content-admin'
-  ];
-  hideIds.forEach(id => {
-    const el = document.getElementById(id);
-    if (el) el.style.display = 'none';
-  });
-
-  // Hide the header div (dashboard title) and tab bar (no IDs — use querySelector)
-  document.querySelectorAll('.main-tab-container, .main-tab-content').forEach(el => {
-    el.style.display = 'none';
-  });
-
-  // Hide the h1 header bar — it is the first direct child div of body with margin-left:60px
-  document.querySelectorAll('body > div').forEach(el => {
-    if (el.id !== 'popout-overlay') el.style.display = 'none';
-  });
-
-  // Find the app
   const app = allApplications.find(a => a.id === appId);
-  if (!app) {
-    document.getElementById('popout-overlay').classList.add('active');
-    document.getElementById('popout-detail').innerHTML =
-      '<div style="padding:40px;text-align:center;color:var(--color-text-secondary);">Application not found.</div>';
-    return true;
-  }
+  if (!app) return;
 
-  // Set header
-  document.getElementById('popout-header-company').textContent = app.company;
-  document.getElementById('popout-header-role').textContent    = app.role;
+  const linkedContact = app.linkedContactId
+    ? warmLeadsContacts.find(c => c.id === app.linkedContactId)
+    : app.fromContactId
+      ? warmLeadsContacts.find(c => c.id === app.fromContactId)
+      : null;
 
-  // Status badge with colour hierarchy
-  const badge = document.getElementById('popout-status-badge');
-  badge.textContent = app.status;
-  if (app.status === 'Accepted Offer' || app.status === 'Offered') {
-    badge.style.cssText = 'font-size:11px;font-weight:900;padding:4px 10px;border-radius:20px;background:rgba(0,255,128,0.15);color:#00cc66;border:1px solid rgba(0,255,128,0.5);white-space:nowrap;';
-  } else if (app.status === 'Interview Stage') {
-    badge.style.cssText = 'font-size:11px;font-weight:700;padding:4px 10px;border-radius:20px;background:rgba(102,16,242,0.15);color:#a370f7;border:1px solid rgba(102,16,242,0.4);white-space:nowrap;';
-  } else {
-    badge.style.cssText = 'font-size:11px;font-weight:700;padding:4px 10px;border-radius:20px;background:rgba(255,255,255,0.15);color:white;white-space:nowrap;';
-  }
-
-  // Render editable form: make detail-view visible off-screen, call selectApp,
-  // then move the rendered nodes into #popout-detail
-  const detailView = document.getElementById('detail-view');
-  if (detailView) {
-    // Temporarily position off-screen so selectApp renders into a live element
-    detailView.style.position = 'fixed';
-    detailView.style.left = '-9999px';
-    detailView.style.display = 'block';
-    selectApp(app);
-    const popoutDetail = document.getElementById('popout-detail');
-    while (detailView.firstChild) {
-      popoutDetail.appendChild(detailView.firstChild);
-    }
-    detailView.style.position = '';
-    detailView.style.left = '';
-    detailView.style.display = 'none';
-  }
-
-  // Render linked stories and docs in right column
   const linkedStars = starStories.filter(s => s.linkedJobIds && s.linkedJobIds.includes(appId));
   const linkedDocs  = additionalDocs.filter(d => d.jobIds && d.jobIds.includes(appId));
-  const supportEl   = document.getElementById('popout-support');
 
-  let html = '';
-  if (linkedDocs.length > 0) {
-    html += '<div style="margin-bottom:24px;"><div style="font-size:11px;font-weight:700;color:#6f42c1;text-transform:uppercase;letter-spacing:0.7px;border-left:3px solid #6f42c1;padding-left:8px;margin-bottom:12px;">Additional Documents</div>';
-    linkedDocs.forEach(d => {
-      html += '<div style="padding:12px 14px;background:var(--color-background-secondary);border-radius:6px;border-left:3px solid #6f42c1;margin-bottom:10px;font-size:13px;line-height:1.6;">';
-      if (d.type === 'link') {
-        html += '<strong>' + (d.title || '') + '</strong><br><a href="' + (d.url || '') + '" target="_blank" style="color:#0d6efd;font-size:12px;">' + (d.url || '') + '</a>';
-      } else {
-        html += '<strong>' + (d.title || '') + '</strong><div style="font-size:12px;color:var(--color-text-secondary);margin-top:6px;white-space:pre-wrap;">' + (d.content || '') + '</div>';
-      }
-      html += '</div>';
-    });
-    html += '</div>';
-  }
-  if (linkedStars.length > 0) {
-    html += '<div><div style="font-size:11px;font-weight:700;color:#28a745;text-transform:uppercase;letter-spacing:0.7px;border-left:3px solid #28a745;padding-left:8px;margin-bottom:12px;">Linked Stories</div>';
-    linkedStars.forEach(s => {
-      html += '<div style="padding:12px 14px;background:var(--color-background-secondary);border-radius:6px;border-left:3px solid #28a745;margin-bottom:10px;font-size:13px;line-height:1.6;">';
-      html += '<strong>' + (s.title || '') + '</strong>';
-      if (s.description) html += '<div style="font-size:12px;color:var(--color-text-secondary);margin-top:4px;white-space:pre-wrap;">' + s.description + '</div>';
-      if (s.metrics)     html += '<div style="margin-top:8px;padding:8px 10px;background:rgba(40,167,69,0.1);border-radius:4px;border-left:3px solid #28a745;font-size:12px;white-space:pre-wrap;color:#28a745;">' + s.metrics + '</div>';
-      html += '</div>';
-    });
-    html += '</div>';
-  }
-  if (!html) {
-    html = '<div style="color:var(--color-text-secondary);font-size:13px;padding:20px 0;">No linked stories or documents.</div>';
-  }
-  supportEl.innerHTML = html;
+  const esc = s => String(s || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
 
-  // Restore scroll position after reload
-  const savedScroll = sessionStorage.getItem('popout-scroll');
-  if (savedScroll) {
-    window.scrollTo(0, parseInt(savedScroll));
-    sessionStorage.removeItem('popout-scroll');
+  function rowHtml(label, value) {
+    if (!value) return '';
+    return '<div style="display:grid;grid-template-columns:160px 1fr;gap:4px;margin-bottom:6px;font-size:13px;">'
+      + '<div style="color:#6c757d;font-weight:500;">' + esc(label) + '</div>'
+      + '<div>' + esc(value) + '</div></div>';
+  }
+  function checkHtml(label, checked) {
+    return '<div style="display:flex;align-items:center;gap:6px;margin-bottom:4px;font-size:13px;">'
+      + '<span style="color:' + (checked ? '#28a745' : '#aaa') + ';">' + (checked ? '☑' : '☐') + '</span>'
+      + '<span style="' + (checked ? '' : 'color:#aaa;') + '">' + esc(label) + '</span></div>';
+  }
+  function sectionHtml(title, color, content) {
+    return '<div style="margin-bottom:24px;">'
+      + '<div style="font-size:11px;font-weight:700;color:' + color + ';text-transform:uppercase;letter-spacing:0.7px;border-left:3px solid ' + color + ';padding-left:8px;margin-bottom:12px;">' + title + '</div>'
+      + content + '</div>';
+  }
+  function cardHtml(content, borderColor) {
+    return '<div style="padding:12px 14px;background:#f8f9fa;border-radius:6px;border-left:3px solid ' + (borderColor || '#dee2e6') + ';margin-bottom:10px;font-size:13px;line-height:1.6;">' + content + '</div>';
   }
 
-  // Update badge when status field changes
-  document.addEventListener('change', function(e) {
-    if (e.target && e.target.id === 'edit-status') {
-      badge.textContent = e.target.value;
-    }
-  });
+  // Application section
+  const interviewRows = [
+    app.interviewInitial ? rowHtml('Initial Interview', app.interviewInitial + ' ' + (app.interviewInitialTime || '')) : '',
+    app.interviewSecond  ? rowHtml('Second Interview',  app.interviewSecond  + ' ' + (app.interviewSecondTime  || '')) : '',
+    app.interviewThird   ? rowHtml('Third Interview',   app.interviewThird   + ' ' + (app.interviewThirdTime   || '')) : '',
+  ].filter(Boolean).join('');
 
-  // Activate the overlay
-  document.getElementById('popout-overlay').classList.add('active');
-  return true;
+  const hiringHtml = (app.hiringContactName || app.hiringContactEmail || app.hiringContactLinkedIn)
+    ? '<div style="margin-top:12px;padding:10px 12px;background:#d1ecf1;border-radius:5px;border-left:3px solid #0c5460;">'
+      + '<div style="font-size:11px;font-weight:700;color:#0c5460;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:6px;">Hiring Team Contact</div>'
+      + (app.hiringContactName    ? '<div style="font-size:13px;font-weight:600;margin-bottom:4px;">' + esc(app.hiringContactName) + '</div>' : '')
+      + (app.hiringContactEmail   ? '<div style="font-size:12px;margin-bottom:3px;">📧 ' + esc(app.hiringContactEmail) + '</div>' : '')
+      + (app.hiringContactLinkedIn ? '<div style="font-size:12px;">🔗 ' + esc(app.hiringContactLinkedIn) + '</div>' : '')
+      + '</div>'
+    : '';
+
+  const appSection = sectionHtml('Application Details', '#0d6efd',
+    rowHtml('Status', app.status)
+    + rowHtml('Applied', app.appDate)
+    + rowHtml('Resume', app.resume)
+    + rowHtml('Location', app.geographyDisplay || app.geography)
+    + rowHtml('Location Type', app.locationType)
+    + rowHtml('Employment', app.employmentType)
+    + rowHtml('Salary', app.salary)
+    + rowHtml('Confidence', app.confidenceScore ? app.confidenceScore + '/10' : '')
+    + rowHtml('Next Action', app.nextAction)
+    + rowHtml('Due Date', app.dueDate)
+    + (app.notes ? '<div style="margin-top:10px;padding:10px 12px;background:#fff3cd;border-radius:5px;border-left:3px solid #ffc107;font-size:13px;white-space:pre-wrap;">' + esc(app.notes) + '</div>' : '')
+    + hiringHtml
+    + (linkedContact ? '<div style="margin-top:10px;padding:8px 12px;background:#d1ecf1;border-radius:5px;font-size:12px;color:#0c5460;">👤 Warm Lead: ' + esc(linkedContact.name) + ' — ' + esc(linkedContact.company) + '</div>' : '')
+  );
+
+  const trackingHtml = '<div style="display:grid;grid-template-columns:1fr 1fr;gap:0;">'
+    + '<div>' + checkHtml('Bio Sent', app.bioSent) + '</div>'
+    + '<div>' + checkHtml('References Sent', app.referencesSent) + '</div>'
+    + '<div>' + checkHtml('Follow-up Round 1', app.followup1) + '</div>'
+    + '<div>' + checkHtml('Follow-up Round 2', app.followup2) + '</div>'
+    + '<div>' + checkHtml('Follow-up Round 3', app.followup3) + '</div>'
+    + '</div>';
+
+  const addSection = sectionHtml('Additional Details', '#6c757d',
+    (app.jobUrl ? '<div style="margin-bottom:8px;font-size:13px;"><strong>Job Posting:</strong> <a href="' + esc(app.jobUrl) + '" target="_blank" style="color:#0d6efd;">' + esc(app.jobUrl) + '</a></div>' : '')
+    + (app.jaUrl  ? '<div style="margin-bottom:8px;font-size:13px;"><strong>Job Analysis:</strong> <a href="' + esc(app.jaUrl) + '" target="_blank" style="color:#0d6efd;">' + esc(app.jaUrl) + '</a></div>' : '')
+    + (app.jdPdfPath ? '<div style="margin-bottom:8px;font-size:12px;color:#6c757d;"><strong>JD Archive:</strong> ' + esc(app.jdPdfPath) + '</div>' : '')
+    + (interviewRows ? '<div style="margin-top:12px;margin-bottom:6px;font-size:12px;font-weight:600;color:#495057;">Interview Schedule</div>' + interviewRows : '')
+    + '<div style="margin-top:12px;margin-bottom:6px;font-size:12px;font-weight:600;color:#495057;">Application Tracking</div>'
+    + trackingHtml
+  );
+
+  // Support items
+  const starsHtml = linkedStars.length === 0
+    ? '<div style="color:#aaa;font-size:13px;font-style:italic;">No stories linked.</div>'
+    : linkedStars.map(s => {
+        const govBadges = (s.links || []).map(lid => {
+          const g = governanceItems.find(gi => gi.id === lid);
+          return g ? '<span style="font-size:9px;background:#d4edda;color:#155724;padding:1px 5px;border-radius:3px;margin-right:3px;">' + esc(g.title) + '</span>' : '';
+        }).join('');
+        const met = s.metrics ? '<div style="margin-top:8px;padding:8px 10px;background:#d4edda;border-radius:4px;border-left:3px solid #28a745;font-size:12px;white-space:pre-wrap;color:#155724;">' + esc(s.metrics) + '</div>' : '';
+        const oth = (s.other || '').trim() && s.other !== '* Primary Competency:\n* Secondary Competency:\n* "Mic Drop":'
+          ? '<div style="margin-top:6px;padding:8px 10px;background:#fff3cd;border-radius:4px;border-left:3px solid #856404;font-size:12px;white-space:pre-wrap;color:#856404;">' + esc(s.other) + '</div>' : '';
+        return cardHtml('<strong>' + esc(s.title) + '</strong>'
+          + (govBadges ? '<div style="margin-top:4px;">' + govBadges + '</div>' : '')
+          + '<div style="font-size:12px;color:#6c757d;margin-top:4px;white-space:pre-wrap;">' + esc(s.description) + '</div>'
+          + met + oth, '#28a745');
+      }).join('');
+
+  const docsHtml = linkedDocs.length === 0
+    ? '<div style="color:#aaa;font-size:13px;font-style:italic;">No documents linked.</div>'
+    : linkedDocs.map(d => {
+        const body = d.type === 'link'
+          ? '<strong>' + esc(d.title) + '</strong><br><a href="' + esc(d.url) + '" target="_blank" style="font-size:12px;color:#0d6efd;">' + esc(d.url) + '</a>'
+          : '<strong>' + esc(d.title) + '</strong><div style="font-size:12px;color:#6c757d;margin-top:6px;white-space:pre-wrap;">' + esc(d.content) + '</div>';
+        return cardHtml(body, '#6f42c1');
+      }).join('');
+
+  const supportSection = sectionHtml('Additional Documents', '#6f42c1', docsHtml)
+    + sectionHtml('Linked Stories', '#28a745', starsHtml);
+
+  // Assemble page using string concatenation — no template literals, no closing tag conflicts
+  const doctype   = '<!DOCTYPE html>';
+  const htmlOpen  = '<html lang="en">';
+  const headOpen  = '<head>';
+  const headClose = '<' + '/head>';
+  const bodyOpen  = '<body>';
+  const bodyClose = '<' + '/body>';
+  const htmlClose = '<' + '/html>';
+
+  const css = '<meta charset="UTF-8">'
+    + '<meta name="viewport" content="width=device-width,initial-scale=1.0">'
+    + '<title>' + esc(app.company) + '</title>'
+    + '<style>'
+    + '*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }'
+    + 'body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; color: #212529; background: #f5f6f7; padding: 0; }'
+    + '.header { background: #1e2a3a; color: white; padding: 16px 28px; display: flex; justify-content: space-between; align-items: center; position: sticky; top: 0; z-index: 10; }'
+    + '.header h1 { font-size: 18px; font-weight: 600; }'
+    + '.header .meta { font-size: 12px; color: #adb5bd; margin-top: 2px; }'
+    + '.badge { font-size: 11px; font-weight: 700; padding: 4px 10px; border-radius: 20px; background: rgba(255,255,255,0.15); white-space: nowrap; }'
+    + '.body { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; max-width: 1200px; margin: 0 auto; padding: 24px 24px 60px; align-items: start; }'
+    + 'a { color: #0d6efd; }'
+    + '@media (max-width: 700px) { .body { grid-template-columns: 1fr; } }'
+    + '<' + '/style>';
+
+  const header = '<div class="header">'
+    + '<div><div class="header h1">' + esc(app.company) + '</div><div class="meta">' + esc(app.role) + '</div></div>'
+    + '<span class="badge">' + esc(app.status) + '</span>'
+    + '</div>';
+
+  const body = '<div class="body">'
+    + '<div>' + appSection + addSection + '</div>'
+    + '<div>' + supportSection + '</div>'
+    + '</div>';
+
+  const fullHtml = doctype + htmlOpen + headOpen + css + headClose + bodyOpen + header + body + bodyClose + htmlClose;
+
+  const blob = new Blob([fullHtml], { type: 'text/html' });
+  const url  = URL.createObjectURL(blob);
+  const win  = window.open(url, '_blank');
+  if (!win) {
+    const a = document.createElement('a');
+    a.href = url; a.target = '_blank'; a.rel = 'noopener';
+    document.body.appendChild(a); a.click(); document.body.removeChild(a);
+  }
+  setTimeout(() => URL.revokeObjectURL(url), 10000);
 }
-
-// Parent window: listen for pop-out saves and re-render
-(function initParentListener() {
-  try {
-    const bc = new BroadcastChannel('jd-pipeline-sync');
-    bc.onmessage = function(event) {
-      if (event.data && event.data.type === 'popout-saved') {
-        // Reload data from localStorage and re-render
-        const fresh = localStorage.getItem('pipeline-data');
-        if (fresh) {
-          allApplications.length = 0;
-          allApplications.push(...JSON.parse(fresh));
-          renderList();
-          calculateConversionMetrics();
-        }
-        // Re-select the app in the detail panel if it is still open
-        if (selectedApp && event.data.appId === selectedApp.id) {
-          const updated = allApplications.find(a => a.id === selectedApp.id);
-          if (updated) selectApp(updated);
-        }
-      }
-    };
-  } catch(e) {
-    // BroadcastChannel not supported — silent fallback
-  }
-})();
 
 // ============================================================================
 // CLOUD SYNC UI (Visual Only — provider logic not yet active)
@@ -8965,7 +8808,7 @@ function syncInitMSAL() {
   _msalInstance = new msal.PublicClientApplication({
     auth: {
       clientId: clientId,
-      authority: 'https://login.microsoftonline.com/common',
+      authority: 'https://login.microsoftonline.com/consumers',
       redirectUri: SYNC_OD_REDIRECT
     },
     cache: { cacheLocation: 'sessionStorage', storeAuthStateInCookie: false }
@@ -9143,12 +8986,16 @@ async function syncODLoad() {
   }
 }
 
-// ── Assemble Full Payload ─────────────────────────────────────────────────────
+// ============================================================================
+// END CLOUD SYNC
+// ============================================================================
+
+</script>
 
 function syncBuildPayload() {
   return JSON.stringify({
     exportedAt: new Date().toISOString(),
-    exportVersion: '8.0',
+    exportVersion: '4.0',
     applications: allApplications,
     contacts: warmLeadsContacts,
     starStories: starStories,
@@ -9375,26 +9222,6 @@ function selectSyncProvider(provider) {
 // ============================================================================
 
 </script>
-
-<!-- Pop-out Edit Overlay (activated when ?popout=ID is in URL) -->
-<div id="popout-overlay">
-  <div id="popout-header">
-    <div>
-      <div id="popout-header-company" style="font-size: 16px; font-weight: 600;"></div>
-      <div id="popout-header-role" class="meta"></div>
-    </div>
-    <div id="popout-save-bar">
-      <span id="popout-status-badge"></span>
-      <span id="popout-save-msg" style="font-size: 12px; color: #a8d5a2;"></span>
-      <button onclick="saveAppChanges();" style="padding: 7px 18px; background: #198754; color: white; border: none; border-radius: 5px; font-size: 13px; font-weight: 600; cursor: pointer;">💾 Save</button>
-      <button onclick="window.close();" style="padding: 7px 14px; background: rgba(255,255,255,0.1); color: white; border: 1px solid rgba(255,255,255,0.2); border-radius: 5px; font-size: 13px; cursor: pointer;">✕ Close</button>
-    </div>
-  </div>
-  <div id="popout-body">
-    <div id="popout-detail"></div>
-    <div id="popout-support"></div>
-  </div>
-</div>
 
 </body>
 </html>
