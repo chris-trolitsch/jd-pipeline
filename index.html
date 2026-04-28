@@ -4211,8 +4211,14 @@ function loadProfile() {
     const googleCidEl = document.getElementById('sync-google-client-id');
     const odCidEl = document.getElementById('sync-onedrive-client-id');
     if (filenameEl) filenameEl.value = profileData.syncFilename || 'jd-pipeline.json';
-    if (profileData.syncProvider && profileData.syncProvider !== 'none') {
-      selectSyncProvider(profileData.syncProvider);
+    // Restore provider: profile data wins, localStorage as fallback
+    const storedProvider = localStorage.getItem('sync-provider');
+    const resolvedProvider = (profileData.syncProvider && profileData.syncProvider !== 'none')
+      ? profileData.syncProvider
+      : (storedProvider && storedProvider !== 'none' ? storedProvider : null);
+    if (resolvedProvider) {
+      selectSyncProvider(resolvedProvider);
+      syncSetStar(true);
     }
     if (googleCidEl) googleCidEl.value = profileData.syncGoogleClientId || '';
     if (odCidEl) odCidEl.value = profileData.syncOneDriveClientId || '';
@@ -8697,6 +8703,21 @@ function syncSetBadge(text, bg, color) {
   el.style.color = color;
 }
 
+function syncSetStar(show) {
+  const tab = document.getElementById('main-tab-repository');
+  if (!tab) return;
+  const existing = tab.querySelector('.sync-star');
+  if (show && !existing) {
+    const star = document.createElement('span');
+    star.className = 'sync-star';
+    star.textContent = ' ★';
+    star.style.cssText = 'color: #e74c3c; font-size: 11px; vertical-align: super; line-height: 1;';
+    tab.appendChild(star);
+  } else if (!show && existing) {
+    existing.remove();
+  }
+}
+
 function syncRecordTime() {
   const now = new Date().toLocaleTimeString('en-CA', { hour: '2-digit', minute: '2-digit' });
   localStorage.setItem('sync-last-time', now);
@@ -8746,6 +8767,7 @@ function syncHandleToken(response) {
   _syncToken = response.access_token;
   syncSetStatus('#27ae60', 'Connected — token active (~60 min)', 'Reconnect', true);
   syncSetBadge('Connected', '#d4edda', '#155724');
+  syncSetStar(false);
   syncRestoreLastTime();
   // Auto-load on connect: pull latest data from Drive
   syncLoad();
@@ -8830,6 +8852,7 @@ async function syncConnectOneDrive() {
     _odToken = tokenResult.accessToken;
     syncSetStatus('#27ae60', 'Connected to OneDrive — token active', 'Reconnect', true);
     syncSetBadge('Connected', '#d4edda', '#155724');
+    syncSetStar(false);
     syncRestoreLastTime();
     // Auto-load on connect
     await syncODLoad();
@@ -8842,6 +8865,7 @@ async function syncConnectOneDrive() {
         _odToken = tokenResult.accessToken;
         syncSetStatus('#27ae60', 'Connected to OneDrive', 'Reconnect', true);
         syncSetBadge('Connected', '#d4edda', '#155724');
+        syncSetStar(false);
         syncRestoreLastTime();
         await syncODLoad();
       } catch (err2) {
@@ -9158,6 +9182,7 @@ function toggleSyncInstructions() {
 
 function selectSyncProvider(provider) {
   _syncProvider = provider;
+  localStorage.setItem('sync-provider', provider);
 
   // Update card highlight
   ['none','google','onedrive'].forEach(p => {
@@ -9193,6 +9218,7 @@ function selectSyncProvider(provider) {
     if (googleClientRow) googleClientRow.style.display = 'none';
     if (odClientRow)     odClientRow.style.display = 'none';
     syncSetBadge('Not Connected', '#fff3cd', '#856404');
+    syncSetStar(false);
     _syncToken = null;
     _syncFileId = null;
     _odToken = null;
