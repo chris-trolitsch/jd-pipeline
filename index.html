@@ -1067,64 +1067,76 @@ input, select, textarea {
     <div id="repo-tab-jobai" class="tab-content">
       <div style="padding: 8px 0;">
 
-        <!-- Header -->
-        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+        <!-- ── TAB HEADER ─────────────────────────────────────────────────── -->
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.75rem;">
           <div>
             <h3 style="margin: 0; font-size: 16px; color: var(--color-text-primary);">Job AI Configuration</h3>
-            <div style="font-size: 12px; color: var(--color-text-secondary); margin-top: 3px;">Build your AI setup prompt from your career profile. Generate, copy, and paste into your AI of choice.</div>
+            <div style="font-size: 12px; color: var(--color-text-secondary); margin-top: 3px;">Build your AI setup prompt. Fill in the profile band, configure your rules, then generate and copy to your AI.</div>
           </div>
-          <div style="display: flex; gap: 8px;">
+          <div style="display: flex; gap: 8px; align-items: center;">
+            <div id="jobai-save-status" style="font-size: 12px; color: var(--color-text-success);"></div>
             <button onclick="saveJobAI()" style="padding: 6px 14px; font-size: 12px; background: var(--color-background-success); color: var(--color-text-success); border: 1px solid var(--color-text-success); border-radius: 4px; cursor: pointer;">Save All</button>
             <button onclick="backupJobAI()" style="padding: 6px 14px; font-size: 12px; background: var(--color-background-secondary); color: var(--color-text-secondary); border: 1px solid var(--color-border-primary); border-radius: 4px; cursor: pointer;">Backup</button>
             <button onclick="restoreJobAI()" style="padding: 6px 14px; font-size: 12px; background: var(--color-background-warning); color: var(--color-text-warning); border: 1px solid var(--color-text-warning); border-radius: 4px; cursor: pointer;">Restore</button>
             <button onclick="importJobAI()" style="padding: 6px 14px; font-size: 12px; background: var(--color-background-info); color: var(--color-text-info); border: 1px solid var(--color-text-info); border-radius: 4px; cursor: pointer;">Import</button>
           </div>
         </div>
-        <div id="jobai-save-status" style="font-size: 12px; margin-bottom: 0.75rem; color: var(--color-text-success); min-height: 16px;"></div>
 
-        <!-- 3-COLUMN GRID -->
-        <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 16px; align-items: start;">
+        <!-- ── TOP BAND: CAREER PROFILE ──────────────────────────────────── -->
+        <div style="padding: 16px 18px; background: var(--color-background-secondary); border-radius: 8px; border-left: 3px solid #0d6efd; margin-bottom: 14px;">
+          <div style="font-size: 12px; font-weight: 700; color: #0d6efd; text-transform: uppercase; letter-spacing: 0.6px; margin-bottom: 12px;">Candidate Profile</div>
 
-          <!-- COLUMN 1: Career Profile + Auto-Skip Rules -->
-          <div style="display: flex; flex-direction: column; gap: 14px;">
-
-            <!-- Career Profile -->
-            <div style="padding: 14px 16px; background: var(--color-background-secondary); border-radius: 8px; border-left: 3px solid #0d6efd;">
-              <div style="font-size: 12px; font-weight: 700; color: #0d6efd; text-transform: uppercase; letter-spacing: 0.6px; margin-bottom: 12px;">Career Profile</div>
-              <div class="form-group">
-                <label class="form-label">Target Role Level</label>
-                <input type="text" id="jai-level" class="form-control" placeholder="e.g. Senior Manager to Director">
-              </div>
-              <div class="form-group">
-                <label class="form-label">Specialty / Domain</label>
-                <input type="text" id="jai-specialty" class="form-control" placeholder="e.g. IT Delivery, ITSM, Release Management">
-              </div>
-              <div class="form-group">
-                <label class="form-label">Compensation Floor (annual base)</label>
-                <input type="text" id="jai-comp" class="form-control" placeholder="e.g. $160,000 CAD">
-              </div>
-              <div class="form-group">
-                <label class="form-label">Location / Relocation</label>
-                <input type="text" id="jai-location" class="form-control" placeholder="e.g. Vancouver BC, open to Calgary, Toronto, remote">
-              </div>
-              <div class="form-group">
-                <label class="form-label">Work Model Preference</label>
-                <select id="jai-workmodel" class="form-control">
-                  <option value="any">Any (remote, hybrid, on-site)</option>
-                  <option value="remote">Remote preferred</option>
-                  <option value="hybrid">Hybrid preferred</option>
-                  <option value="onsite">On-site acceptable</option>
-                </select>
-              </div>
-              <div class="form-group">
-                <label class="form-label">Core Strengths (one per line)</label>
-                <textarea id="jai-strengths" class="form-control" style="min-height: 72px; font-size: 12px;" placeholder="Enterprise cutover leadership&#10;ServiceNow ITSM platform ownership&#10;Financial services governance"></textarea>
-              </div>
-              <div class="form-group" style="margin-bottom: 0;">
-                <label class="form-label">Career Track</label>
-                <textarea id="jai-careertrack" class="form-control" style="min-height: 64px; font-size: 12px; resize: vertical;" placeholder="Describe the candidate's career track and what roles to skip. e.g.: This candidate is on the COO delivery track — Platform Implementation Delivery. Skip any role that is primarily IT infrastructure operations, cybersecurity leadership, IT strategy formulation, or business continuity regardless of compensation."></textarea>
-              </div>
+          <!-- Row 1: 3 fields -->
+          <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 12px; margin-bottom: 10px;">
+            <div class="form-group" style="margin-bottom: 0;">
+              <label class="form-label">Target Role Level</label>
+              <input type="text" id="jai-level" class="form-control" placeholder="e.g. Senior Manager to Director">
             </div>
+            <div class="form-group" style="margin-bottom: 0;">
+              <label class="form-label">Specialty / Domain</label>
+              <input type="text" id="jai-specialty" class="form-control" placeholder="e.g. IT Delivery, ITSM, Release Management">
+            </div>
+            <div class="form-group" style="margin-bottom: 0;">
+              <label class="form-label">Compensation Floor (annual base)</label>
+              <input type="text" id="jai-comp" class="form-control" placeholder="e.g. $160,000 CAD">
+            </div>
+          </div>
+
+          <!-- Row 2: 2 fields -->
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 12px;">
+            <div class="form-group" style="margin-bottom: 0;">
+              <label class="form-label">Location / Relocation</label>
+              <input type="text" id="jai-location" class="form-control" placeholder="e.g. Vancouver BC, open to Calgary, Toronto, remote">
+            </div>
+            <div class="form-group" style="margin-bottom: 0;">
+              <label class="form-label">Work Model Preference</label>
+              <select id="jai-workmodel" class="form-control">
+                <option value="any">Any (remote, hybrid, on-site)</option>
+                <option value="remote">Remote preferred</option>
+                <option value="hybrid">Hybrid preferred</option>
+                <option value="onsite">On-site acceptable</option>
+              </select>
+            </div>
+          </div>
+
+          <!-- Row 3: Core Strengths + Career Track side by side -->
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
+            <div class="form-group" style="margin-bottom: 0;">
+              <label class="form-label">Core Strengths (one per line)</label>
+              <textarea id="jai-strengths" class="form-control" style="min-height: 140px; font-size: 12px; resize: vertical;" placeholder="Enterprise cutover leadership&#10;ServiceNow ITSM platform ownership&#10;Financial services regulatory compliance&#10;Three-Pillar governance framework&#10;HSBC mobile platform cutover — 25M users"></textarea>
+            </div>
+            <div class="form-group" style="margin-bottom: 0;">
+              <label class="form-label">Career Track</label>
+              <textarea id="jai-careertrack" class="form-control" style="min-height: 140px; font-size: 12px; resize: vertical;" placeholder="Describe the candidate's delivery track and what to skip. e.g.: This candidate is on the COO delivery track — Platform Implementation. Skip any role that is primarily IT infrastructure operations, cybersecurity leadership, IT strategy formulation, or business continuity regardless of compensation."></textarea>
+            </div>
+          </div>
+        </div>
+
+        <!-- ── MAIN BODY: left col + middle col + right rail ─────────────── -->
+        <div style="display: grid; grid-template-columns: 1fr 1fr 340px; gap: 14px; align-items: start;">
+
+          <!-- LEFT COLUMN: Auto-Skip + Governance Rules -->
+          <div style="display: flex; flex-direction: column; gap: 14px;">
 
             <!-- Auto-Skip Rules -->
             <div style="padding: 14px 16px; background: var(--color-background-secondary); border-radius: 8px; border-left: 3px solid #e74c3c;">
@@ -1136,18 +1148,13 @@ input, select, textarea {
                   <button onclick="restoreSkipRules()" style="padding: 2px 8px; font-size: 11px; background: var(--color-background-warning); color: var(--color-text-warning); border: 1px solid var(--color-text-warning); border-radius: 4px; cursor: pointer;">Restore</button>
                 </div>
               </div>
-              <div style="font-size: 11px; color: var(--color-text-secondary); margin-bottom: 8px;">One rule per line. Injected into every generated prompt. Independently saved.</div>
+              <div style="font-size: 11px; color: var(--color-text-secondary); margin-bottom: 8px;">One rule per line. Injected into every generated prompt before analysis begins. Independently saved.</div>
               <div id="jai-skiprules-status" style="font-size: 11px; color: var(--color-text-success); min-height: 14px; margin-bottom: 4px;"></div>
               <textarea id="jai-skiprules" class="form-control" style="min-height: 140px; font-size: 12px; resize: vertical;" placeholder="No salary listed&#10;Salary below compensation floor&#10;Management consulting strategy firms&#10;PROSCI certification required&#10;Product Management roles&#10;Contract rate below floor"></textarea>
               <input type="file" id="jai-skiprules-file" accept=".json" style="display:none;" onchange="handleSkipRulesFile(event)">
             </div>
 
-          </div>
-
-          <!-- COLUMN 2: Governance + Scoring Thresholds + ATS Scoring + Analysis Steps -->
-          <div style="display: flex; flex-direction: column; gap: 14px;">
-
-            <!-- Governance Rules for Prompt -->
+            <!-- Governance Rules -->
             <div style="padding: 14px 16px; background: var(--color-background-secondary); border-radius: 8px; border-left: 3px solid #16a085;">
               <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px;">
                 <div style="font-size: 12px; font-weight: 700; color: #16a085; text-transform: uppercase; letter-spacing: 0.6px;">Governance Rules for Prompt</div>
@@ -1157,11 +1164,16 @@ input, select, textarea {
                   <button onclick="restoreGovRules()" style="padding: 2px 8px; font-size: 11px; background: var(--color-background-warning); color: var(--color-text-warning); border: 1px solid var(--color-text-warning); border-radius: 4px; cursor: pointer;">Restore</button>
                 </div>
               </div>
-              <div style="font-size: 11px; color: var(--color-text-secondary); margin-bottom: 8px;">Your proprietary governance frameworks injected verbatim into the prompt. Three-Pillar, methodology rules, anything the AI must apply consistently. Independently saved.</div>
+              <div style="font-size: 11px; color: var(--color-text-secondary); margin-bottom: 8px;">Proprietary frameworks injected verbatim into the prompt. Three-Pillar, methodology rules, anything the AI must apply consistently.</div>
               <div id="jai-govrules-status" style="font-size: 11px; color: var(--color-text-success); min-height: 14px; margin-bottom: 6px;"></div>
-              <textarea id="jai-govrules" class="form-control" style="min-height: 120px; font-size: 12px; resize: vertical;" placeholder="Three-Pillar Governance Framework:&#10;- Pillar 1: Vendor Accountability and Peer Review&#10;- Pillar 2: Outcome-Based KPIs&#10;- Pillar 3: Strategic Translation"></textarea>
+              <textarea id="jai-govrules" class="form-control" style="min-height: 140px; font-size: 12px; resize: vertical;" placeholder="Three-Pillar Governance Framework:&#10;- Pillar 1: Vendor Accountability and Peer Review&#10;- Pillar 2: Outcome-Based KPIs&#10;- Pillar 3: Strategic Translation"></textarea>
               <input type="file" id="jai-govrules-file" accept=".json" style="display:none;" onchange="handleGovRulesFile(event)">
             </div>
+
+          </div>
+
+          <!-- MIDDLE COLUMN: Scoring Thresholds + ATS/iCIMS Weights + Analysis Steps -->
+          <div style="display: flex; flex-direction: column; gap: 14px;">
 
             <!-- Scoring Thresholds -->
             <div style="padding: 14px 16px; background: var(--color-background-secondary); border-radius: 8px; border-left: 3px solid #e67e22;">
@@ -1175,23 +1187,23 @@ input, select, textarea {
               </div>
               <div style="font-size: 11px; color: var(--color-text-secondary); margin-bottom: 8px;">Confidence scoring scale and minimum APPLY threshold. Injected into the Governance section of the prompt. Edit freely — these are your benchmarks.</div>
               <div id="jai-scoring-status" style="font-size: 11px; color: var(--color-text-success); min-height: 14px; margin-bottom: 6px;"></div>
-              <textarea id="jai-scoring" class="form-control" style="min-height: 130px; font-size: 12px; resize: vertical;"></textarea>
+              <textarea id="jai-scoring" class="form-control" style="min-height: 140px; font-size: 12px; resize: vertical;"></textarea>
               <input type="file" id="jai-scoring-file" accept=".json" style="display:none;" onchange="handleScoringThresholdsFile(event)">
             </div>
 
-            <!-- ATS/iCIMS Scoring Weights -->
+            <!-- ATS/iCIMS Scoring Weights & Customization Thresholds -->
             <div style="padding: 14px 16px; background: var(--color-background-secondary); border-radius: 8px; border-left: 3px solid #2980b9;">
               <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px;">
-                <div style="font-size: 12px; font-weight: 700; color: #2980b9; text-transform: uppercase; letter-spacing: 0.6px;">ATS / iCIMS Scoring Weights</div>
+                <div style="font-size: 12px; font-weight: 700; color: #2980b9; text-transform: uppercase; letter-spacing: 0.6px;">ATS / iCIMS Scoring Weights &amp; Customization Thresholds</div>
                 <div style="display: flex; gap: 5px;">
                   <button onclick="saveATSWeights()" style="padding: 2px 8px; font-size: 11px; background: var(--color-background-success); color: var(--color-text-success); border: 1px solid var(--color-text-success); border-radius: 4px; cursor: pointer;">Save</button>
                   <button onclick="backupATSWeights()" style="padding: 2px 8px; font-size: 11px; background: var(--color-background-secondary); color: var(--color-text-secondary); border: 1px solid var(--color-border-primary); border-radius: 4px; cursor: pointer;">Backup</button>
                   <button onclick="restoreATSWeights()" style="padding: 2px 8px; font-size: 11px; background: var(--color-background-warning); color: var(--color-text-warning); border: 1px solid var(--color-text-warning); border-radius: 4px; cursor: pointer;">Restore</button>
                 </div>
               </div>
-              <div style="font-size: 11px; color: var(--color-text-secondary); margin-bottom: 8px;">Recommended scoring weights based on proven experience. Injected into the Governance section. Adjust point allocations to reflect your own assessment model.</div>
+              <div style="font-size: 11px; color: var(--color-text-secondary); margin-bottom: 8px;">Recommended values based on proven experience. Injected into the Governance section. Adjust point allocations and thresholds to reflect your own model.</div>
               <div id="jai-ats-status" style="font-size: 11px; color: var(--color-text-success); min-height: 14px; margin-bottom: 6px;"></div>
-              <textarea id="jai-atsweights" class="form-control" style="min-height: 160px; font-size: 12px; resize: vertical;"></textarea>
+              <textarea id="jai-atsweights" class="form-control" style="min-height: 140px; font-size: 12px; resize: vertical;"></textarea>
               <input type="file" id="jai-atsweights-file" accept=".json" style="display:none;" onchange="handleATSWeightsFile(event)">
             </div>
 
@@ -1205,9 +1217,9 @@ input, select, textarea {
                   <button onclick="restoreAnalysisSteps()" style="padding: 2px 8px; font-size: 11px; background: var(--color-background-warning); color: var(--color-text-warning); border: 1px solid var(--color-text-warning); border-radius: 4px; cursor: pointer;">Restore</button>
                 </div>
               </div>
-              <div style="font-size: 11px; color: var(--color-text-secondary); margin-bottom: 8px;">The ordered steps the AI follows for each job description. Drag to reorder. Click to edit. Click ✕ to remove. Independently saved.</div>
+              <div style="font-size: 11px; color: var(--color-text-secondary); margin-bottom: 8px;">Ordered steps the AI follows for each job description. Drag to reorder. Click text to edit. Click ✕ to remove.</div>
               <div id="jai-steps-status" style="font-size: 11px; color: var(--color-text-success); min-height: 14px; margin-bottom: 6px;"></div>
-              <div id="jai-steps-list" style="display: flex; flex-direction: column; gap: 5px; margin-bottom: 8px; max-height: 340px; overflow-y: auto;"></div>
+              <div id="jai-steps-list" style="display: flex; flex-direction: column; gap: 5px; margin-bottom: 8px; max-height: 380px; overflow-y: auto;"></div>
               <div style="display: flex; gap: 6px;">
                 <input type="text" id="jai-step-input" class="form-control" style="flex: 1; font-size: 12px;" placeholder="Add a step and press Enter..." onkeydown="if(event.key==='Enter'){addAnalysisStep();}">
                 <button onclick="addAnalysisStep()" style="padding: 4px 10px; font-size: 11px; background: #8e44ad; color: white; border: none; border-radius: 4px; cursor: pointer; white-space: nowrap;">+ Add</button>
@@ -1218,49 +1230,47 @@ input, select, textarea {
 
           </div>
 
-          <!-- COLUMN 3: AI Target + Generated Prompts -->
-          <div style="display: flex; flex-direction: column; gap: 14px;">
+          <!-- RIGHT RAIL: AI Target + Generate + Prompts (fixed 340px) -->
+          <div style="display: flex; flex-direction: column; gap: 14px; position: sticky; top: 10px;">
 
-            <!-- AI Target -->
+            <!-- AI Target + Generate -->
             <div style="padding: 14px 16px; background: var(--color-background-secondary); border-radius: 8px; border-left: 3px solid #27ae60;">
               <div style="font-size: 12px; font-weight: 700; color: #27ae60; text-transform: uppercase; letter-spacing: 0.6px; margin-bottom: 10px;">AI Target</div>
-              <div style="display: flex; gap: 10px;">
-                <label id="jai-target-claude" onclick="selectAITarget('claude')" style="flex: 1; display: flex; flex-direction: column; align-items: center; gap: 4px; padding: 10px; background: #0d6efd; color: white; border-radius: 7px; border: 2px solid #0d6efd; cursor: pointer; text-align: center;">
-                  <div style="font-size: 20px;">✦</div>
-                  <div style="font-size: 12px; font-weight: 700;">Claude</div>
+              <div style="display: flex; gap: 8px; margin-bottom: 12px;">
+                <label id="jai-target-claude" onclick="selectAITarget('claude')" style="flex: 1; display: flex; flex-direction: column; align-items: center; gap: 4px; padding: 10px 6px; background: #0d6efd; color: white; border-radius: 7px; border: 2px solid #0d6efd; cursor: pointer; text-align: center;">
+                  <div style="font-size: 18px;">✦</div>
+                  <div style="font-size: 11px; font-weight: 700;">Claude</div>
                   <div style="font-size: 10px; opacity: 0.85;">claude.ai</div>
                 </label>
-                <label id="jai-target-chatgpt" onclick="selectAITarget('chatgpt')" style="flex: 1; display: flex; flex-direction: column; align-items: center; gap: 4px; padding: 10px; background: var(--color-background-primary); color: var(--color-text-primary); border-radius: 7px; border: 2px solid var(--color-border-primary); cursor: pointer; text-align: center;">
-                  <div style="font-size: 20px;">⬡</div>
-                  <div style="font-size: 12px; font-weight: 700;">ChatGPT</div>
+                <label id="jai-target-chatgpt" onclick="selectAITarget('chatgpt')" style="flex: 1; display: flex; flex-direction: column; align-items: center; gap: 4px; padding: 10px 6px; background: var(--color-background-primary); color: var(--color-text-primary); border-radius: 7px; border: 2px solid var(--color-border-primary); cursor: pointer; text-align: center;">
+                  <div style="font-size: 18px;">⬡</div>
+                  <div style="font-size: 11px; font-weight: 700;">ChatGPT</div>
                   <div style="font-size: 10px;">chatgpt.com</div>
                 </label>
               </div>
+              <button onclick="generateJobAIPrompts()" style="width: 100%; padding: 9px; background: #9b59b6; color: white; border: none; border-radius: 6px; font-size: 13px; font-weight: 700; cursor: pointer; letter-spacing: 0.3px;">⚡ Generate Prompt</button>
               <input type="hidden" id="jai-target" value="claude">
             </div>
 
             <!-- Setup Prompt -->
             <div style="padding: 14px 16px; background: var(--color-background-secondary); border-radius: 8px; border-left: 3px solid #9b59b6;">
               <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
-                <div style="font-size: 12px; font-weight: 700; color: #9b59b6; text-transform: uppercase; letter-spacing: 0.6px;">Prompt 1: Setup Prompt</div>
-                <div style="display: flex; gap: 6px;">
-                  <button onclick="generateJobAIPrompts()" style="padding: 4px 10px; font-size: 11px; background: #9b59b6; color: white; border: none; border-radius: 4px; cursor: pointer;">Generate</button>
-                  <button onclick="copyPrompt('setup')" style="padding: 4px 10px; font-size: 11px; background: var(--color-background-primary); color: var(--color-text-primary); border: 1px solid var(--color-border-primary); border-radius: 4px; cursor: pointer;">Copy</button>
-                </div>
+                <div style="font-size: 12px; font-weight: 700; color: #9b59b6; text-transform: uppercase; letter-spacing: 0.6px;">Setup Prompt</div>
+                <button onclick="copyPrompt('setup')" style="padding: 4px 10px; font-size: 11px; background: #9b59b6; color: white; border: none; border-radius: 4px; cursor: pointer;">Copy</button>
               </div>
-              <div style="font-size: 11px; color: var(--color-text-secondary); margin-bottom: 8px;">Paste this into your AI as the first message. Attach your resume files before sending.</div>
-              <textarea id="jai-prompt-setup" class="form-control" style="min-height: 220px; font-size: 11px; font-family: monospace; resize: vertical;" placeholder="Click Generate to build your setup prompt..." readonly></textarea>
+              <div style="font-size: 11px; color: var(--color-text-secondary); margin-bottom: 8px;">Paste as your first message. Attach resume files before sending.</div>
+              <textarea id="jai-prompt-setup" class="form-control" style="min-height: 280px; font-size: 11px; font-family: monospace; resize: vertical;" placeholder="Click Generate above to build your setup prompt..." readonly></textarea>
               <div id="jai-copy-setup-status" style="font-size: 11px; margin-top: 4px; color: var(--color-text-success); min-height: 14px;"></div>
             </div>
 
             <!-- JD Prompt -->
             <div style="padding: 14px 16px; background: var(--color-background-secondary); border-radius: 8px; border-left: 3px solid #f39c12;">
               <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
-                <div style="font-size: 12px; font-weight: 700; color: #f39c12; text-transform: uppercase; letter-spacing: 0.6px;">Prompt 2: JD Analysis</div>
+                <div style="font-size: 12px; font-weight: 700; color: #f39c12; text-transform: uppercase; letter-spacing: 0.6px;">JD Analysis Prompt</div>
                 <button onclick="copyPrompt('jd')" style="padding: 4px 10px; font-size: 11px; background: var(--color-background-primary); color: var(--color-text-primary); border: 1px solid var(--color-border-primary); border-radius: 4px; cursor: pointer;">Copy</button>
               </div>
-              <div style="font-size: 11px; color: var(--color-text-secondary); margin-bottom: 8px;">Send this as your second message for every role. Paste the job posting below it.</div>
-              <textarea id="jai-prompt-jd" class="form-control" style="min-height: 100px; font-size: 11px; font-family: monospace; resize: vertical;" readonly></textarea>
+              <div style="font-size: 11px; color: var(--color-text-secondary); margin-bottom: 8px;">Send as your second message. Paste the job posting below it.</div>
+              <textarea id="jai-prompt-jd" class="form-control" style="min-height: 90px; font-size: 11px; font-family: monospace; resize: vertical;" readonly></textarea>
               <div id="jai-copy-jd-status" style="font-size: 11px; margin-top: 4px; color: var(--color-text-success); min-height: 14px;"></div>
             </div>
 
