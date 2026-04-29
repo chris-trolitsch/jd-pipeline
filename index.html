@@ -1099,14 +1099,12 @@ input, select, textarea {
         <!-- ── OUTER GRID: 3 equal columns ──────────────────────────────── -->
         <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 14px; align-items: start;">
 
-          <!-- ── PROFILE BAND spans col 1 + col 2 ─────────────────────── -->
-          <div style="grid-column: 1 / 3; padding: 14px 16px; background: var(--color-background-secondary); border-radius: 8px; border-left: 3px solid #0d6efd;">
+          <!-- ── ROW 1 COL 1-2: Candidate Profile ─────────────────────── -->
+          <div style="grid-column: 1 / 3; grid-row: 1; padding: 14px 16px; background: var(--color-background-secondary); border-radius: 8px; border-left: 3px solid #0d6efd;">
             <div style="font-size: 12px; font-weight: 700; color: #0d6efd; text-transform: uppercase; letter-spacing: 0.6px; margin-bottom: 12px;">Candidate Profile</div>
 
             <!-- Inner 2-col: left=Role+Specialty stack, right=Location+Comp+WorkModel row -->
             <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-bottom: 12px;">
-
-              <!-- Left stack: Role Level then Specialty -->
               <div style="display: flex; flex-direction: column; gap: 8px;">
                 <div class="form-group" style="margin-bottom: 0;">
                   <label class="form-label">Target Role Level</label>
@@ -1117,8 +1115,6 @@ input, select, textarea {
                   <input type="text" id="jai-specialty" class="form-control" placeholder="e.g. IT Delivery, ITSM, Release Management">
                 </div>
               </div>
-
-              <!-- Right: Location, Comp, Work Model in a tight 3-col row -->
               <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; align-content: start;">
                 <div class="form-group" style="margin-bottom: 0;">
                   <label class="form-label">Location / Relocation</label>
@@ -1153,8 +1149,24 @@ input, select, textarea {
             </div>
           </div>
 
-          <!-- ── COL 1: Auto-Skip + Scoring + ATS ──────────────────────── -->
-          <div style="display: flex; flex-direction: column; gap: 14px;">
+          <!-- ── ROW 1 COL 3: Governance Rules ────────────────────────── -->
+          <div style="grid-column: 3; grid-row: 1; padding: 14px 16px; background: var(--color-background-secondary); border-radius: 8px; border-left: 3px solid #16a085;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px;">
+              <div style="font-size: 12px; font-weight: 700; color: #16a085; text-transform: uppercase; letter-spacing: 0.6px;">Governance Rules for Prompt</div>
+              <div style="display: flex; gap: 5px;">
+                <button onclick="saveGovRules()" style="padding: 2px 8px; font-size: 11px; background: var(--color-background-success); color: var(--color-text-success); border: 1px solid var(--color-text-success); border-radius: 4px; cursor: pointer;">Save</button>
+                <button onclick="backupGovRules()" style="padding: 2px 8px; font-size: 11px; background: var(--color-background-secondary); color: var(--color-text-secondary); border: 1px solid var(--color-border-primary); border-radius: 4px; cursor: pointer;">Backup</button>
+                <button onclick="restoreGovRules()" style="padding: 2px 8px; font-size: 11px; background: var(--color-background-warning); color: var(--color-text-warning); border: 1px solid var(--color-text-warning); border-radius: 4px; cursor: pointer;">Restore</button>
+              </div>
+            </div>
+            <div style="font-size: 11px; color: var(--color-text-secondary); margin-bottom: 8px;">Proprietary frameworks injected verbatim into the prompt. Three-Pillar, methodology rules, anything the AI must apply consistently.</div>
+            <div id="jai-govrules-status" style="font-size: 11px; color: var(--color-text-success); min-height: 14px; margin-bottom: 6px;"></div>
+            <textarea id="jai-govrules" class="form-control" style="min-height: 320px; font-size: 12px; resize: vertical;" placeholder="Three-Pillar Governance Framework:&#10;- Pillar 1: Vendor Accountability and Peer Review&#10;- Pillar 2: Outcome-Based KPIs&#10;- Pillar 3: Strategic Translation"></textarea>
+            <input type="file" id="jai-govrules-file" accept=".json" style="display:none;" onchange="handleGovRulesFile(event)">
+          </div>
+
+          <!-- ── ROW 2 COL 1: Auto-Skip + Scoring + ATS ────────────────── -->
+          <div style="grid-column: 1; grid-row: 2; display: flex; flex-direction: column; gap: 14px;">
 
             <!-- Auto-Skip Rules -->
             <div style="padding: 14px 16px; background: var(--color-background-secondary); border-radius: 8px; border-left: 3px solid #e74c3c;">
@@ -1206,10 +1218,9 @@ input, select, textarea {
 
           </div>
 
-          <!-- ── COL 2: Analysis Steps (full height, own column) ─────────── -->
-          <div style="display: flex; flex-direction: column; gap: 14px;">
+          <!-- ── ROW 2 COL 2: Analysis Steps ───────────────────────────── -->
+          <div style="grid-column: 2; grid-row: 2; display: flex; flex-direction: column; gap: 14px;">
 
-            <!-- Analysis Steps -->
             <div style="padding: 14px 16px; background: var(--color-background-secondary); border-radius: 8px; border-left: 3px solid #8e44ad;">
               <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px;">
                 <div style="font-size: 12px; font-weight: 700; color: #8e44ad; text-transform: uppercase; letter-spacing: 0.6px;">Analysis Steps</div>
@@ -1232,24 +1243,8 @@ input, select, textarea {
 
           </div>
 
-          <!-- ── COL 3: Governance Rules + Setup Prompt + JD Prompt ──────── -->
-          <div style="display: flex; flex-direction: column; gap: 14px;">
-
-            <!-- Governance Rules -->
-            <div style="padding: 14px 16px; background: var(--color-background-secondary); border-radius: 8px; border-left: 3px solid #16a085;">
-              <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px;">
-                <div style="font-size: 12px; font-weight: 700; color: #16a085; text-transform: uppercase; letter-spacing: 0.6px;">Governance Rules for Prompt</div>
-                <div style="display: flex; gap: 5px;">
-                  <button onclick="saveGovRules()" style="padding: 2px 8px; font-size: 11px; background: var(--color-background-success); color: var(--color-text-success); border: 1px solid var(--color-text-success); border-radius: 4px; cursor: pointer;">Save</button>
-                  <button onclick="backupGovRules()" style="padding: 2px 8px; font-size: 11px; background: var(--color-background-secondary); color: var(--color-text-secondary); border: 1px solid var(--color-border-primary); border-radius: 4px; cursor: pointer;">Backup</button>
-                  <button onclick="restoreGovRules()" style="padding: 2px 8px; font-size: 11px; background: var(--color-background-warning); color: var(--color-text-warning); border: 1px solid var(--color-text-warning); border-radius: 4px; cursor: pointer;">Restore</button>
-                </div>
-              </div>
-              <div style="font-size: 11px; color: var(--color-text-secondary); margin-bottom: 8px;">Proprietary frameworks injected verbatim into the prompt. Three-Pillar, methodology rules, anything the AI must apply consistently.</div>
-              <div id="jai-govrules-status" style="font-size: 11px; color: var(--color-text-success); min-height: 14px; margin-bottom: 6px;"></div>
-              <textarea id="jai-govrules" class="form-control" style="min-height: 140px; font-size: 12px; resize: vertical;" placeholder="Three-Pillar Governance Framework:&#10;- Pillar 1: Vendor Accountability and Peer Review&#10;- Pillar 2: Outcome-Based KPIs&#10;- Pillar 3: Strategic Translation"></textarea>
-              <input type="file" id="jai-govrules-file" accept=".json" style="display:none;" onchange="handleGovRulesFile(event)">
-            </div>
+          <!-- ── ROW 2 COL 3: Setup Prompt + JD Prompt ─────────────────── -->
+          <div style="grid-column: 3; grid-row: 2; display: flex; flex-direction: column; gap: 14px;">
 
             <!-- Setup Prompt -->
             <div style="padding: 14px 16px; background: var(--color-background-secondary); border-radius: 8px; border-left: 3px solid #9b59b6;">
