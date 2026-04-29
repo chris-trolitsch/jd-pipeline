@@ -819,7 +819,7 @@ input, select, textarea {
       <button class="tab-button" onclick="switchRepoTab('governance')" id="tab-repo-governance">Governance</button>
       <button class="tab-button" onclick="switchRepoTab('star')" id="tab-repo-star"><span id="story-type-label">STAR</span> Stories</button>
       <button class="tab-button" onclick="switchRepoTab('documents')" id="tab-repo-documents">Additional Documents</button>
-      <button class="tab-button" onclick="switchRepoTab('jobai')" id="tab-repo-jobai">Job AI</button>
+      <button class="tab-button" onclick="switchRepoTab('jobai')" id="tab-repo-jobai">AI Analysis</button>
     </div>
     
     <!-- Profile Tab -->
@@ -1068,12 +1068,26 @@ input, select, textarea {
       <div style="padding: 8px 0;">
 
         <!-- ── TAB HEADER ───────────────────────────────────────────────── -->
-        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.75rem;">
-          <div>
-            <h3 style="margin: 0; font-size: 16px; color: var(--color-text-primary);">Job AI Configuration</h3>
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.75rem; gap: 12px;">
+          <div style="flex-shrink: 0;">
+            <h3 style="margin: 0; font-size: 16px; color: var(--color-text-primary);">AI Analysis Configuration</h3>
             <div style="font-size: 12px; color: var(--color-text-secondary); margin-top: 3px;">Fill in the profile, configure your rules, then generate and copy to your AI.</div>
           </div>
-          <div style="display: flex; gap: 8px; align-items: center;">
+
+          <!-- AI Target + Generate inline -->
+          <div style="display: flex; align-items: center; gap: 8px; flex: 1; justify-content: center;">
+            <label id="jai-target-claude" onclick="selectAITarget('claude')" style="display: flex; align-items: center; gap: 6px; padding: 5px 14px; background: #0d6efd; color: white; border-radius: 6px; border: 2px solid #0d6efd; cursor: pointer; font-size: 12px; font-weight: 700; white-space: nowrap;">
+              <span style="font-size: 14px;">✦</span> Claude
+            </label>
+            <label id="jai-target-chatgpt" onclick="selectAITarget('chatgpt')" style="display: flex; align-items: center; gap: 6px; padding: 5px 14px; background: var(--color-background-secondary); color: var(--color-text-primary); border-radius: 6px; border: 2px solid var(--color-border-primary); cursor: pointer; font-size: 12px; font-weight: 700; white-space: nowrap;">
+              <span style="font-size: 14px;">⬡</span> ChatGPT
+            </label>
+            <input type="hidden" id="jai-target" value="claude">
+            <button onclick="generateJobAIPrompts()" style="padding: 6px 18px; background: #9b59b6; color: white; border: none; border-radius: 5px; font-size: 12px; font-weight: 700; cursor: pointer; white-space: nowrap;">⚡ Generate</button>
+          </div>
+
+          <!-- Save/Backup/Restore/Import + status -->
+          <div style="display: flex; gap: 8px; align-items: center; flex-shrink: 0;">
             <div id="jobai-save-status" style="font-size: 12px; color: var(--color-text-success);"></div>
             <button onclick="saveJobAI()" style="padding: 6px 14px; font-size: 12px; background: var(--color-background-success); color: var(--color-text-success); border: 1px solid var(--color-text-success); border-radius: 4px; cursor: pointer;">Save All</button>
             <button onclick="backupJobAI()" style="padding: 6px 14px; font-size: 12px; background: var(--color-background-secondary); color: var(--color-text-secondary); border: 1px solid var(--color-border-primary); border-radius: 4px; cursor: pointer;">Backup</button>
@@ -1139,26 +1153,7 @@ input, select, textarea {
             </div>
           </div>
 
-          <!-- ── COL 3 ROW 1: AI Target + Generate (top of rail) ────────── -->
-          <div style="padding: 14px 16px; background: var(--color-background-secondary); border-radius: 8px; border-left: 3px solid #27ae60;">
-            <div style="font-size: 12px; font-weight: 700; color: #27ae60; text-transform: uppercase; letter-spacing: 0.6px; margin-bottom: 10px;">AI Target</div>
-            <div style="display: flex; gap: 8px; margin-bottom: 12px;">
-              <label id="jai-target-claude" onclick="selectAITarget('claude')" style="flex: 1; display: flex; flex-direction: column; align-items: center; gap: 4px; padding: 10px 6px; background: #0d6efd; color: white; border-radius: 7px; border: 2px solid #0d6efd; cursor: pointer; text-align: center;">
-                <div style="font-size: 18px;">✦</div>
-                <div style="font-size: 11px; font-weight: 700;">Claude</div>
-                <div style="font-size: 10px; opacity: 0.85;">claude.ai</div>
-              </label>
-              <label id="jai-target-chatgpt" onclick="selectAITarget('chatgpt')" style="flex: 1; display: flex; flex-direction: column; align-items: center; gap: 4px; padding: 10px 6px; background: var(--color-background-primary); color: var(--color-text-primary); border-radius: 7px; border: 2px solid var(--color-border-primary); cursor: pointer; text-align: center;">
-                <div style="font-size: 18px;">⬡</div>
-                <div style="font-size: 11px; font-weight: 700;">ChatGPT</div>
-                <div style="font-size: 10px;">chatgpt.com</div>
-              </label>
-            </div>
-            <button onclick="generateJobAIPrompts()" style="width: 100%; padding: 9px; background: #9b59b6; color: white; border: none; border-radius: 6px; font-size: 13px; font-weight: 700; cursor: pointer; letter-spacing: 0.3px;">⚡ Generate Prompt</button>
-            <input type="hidden" id="jai-target" value="claude">
-          </div>
-
-          <!-- ── COL 1: Auto-Skip + Governance + Scoring + ATS ─────────── -->
+          <!-- ── COL 1: Auto-Skip + Scoring + ATS ──────────────────────── -->
           <div style="display: flex; flex-direction: column; gap: 14px;">
 
             <!-- Auto-Skip Rules -->
@@ -1175,22 +1170,6 @@ input, select, textarea {
               <div id="jai-skiprules-status" style="font-size: 11px; color: var(--color-text-success); min-height: 14px; margin-bottom: 4px;"></div>
               <textarea id="jai-skiprules" class="form-control" style="min-height: 140px; font-size: 12px; resize: vertical;" placeholder="No salary listed&#10;Salary below compensation floor&#10;Management consulting strategy firms&#10;PROSCI certification required&#10;Product Management roles&#10;Contract rate below floor"></textarea>
               <input type="file" id="jai-skiprules-file" accept=".json" style="display:none;" onchange="handleSkipRulesFile(event)">
-            </div>
-
-            <!-- Governance Rules -->
-            <div style="padding: 14px 16px; background: var(--color-background-secondary); border-radius: 8px; border-left: 3px solid #16a085;">
-              <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px;">
-                <div style="font-size: 12px; font-weight: 700; color: #16a085; text-transform: uppercase; letter-spacing: 0.6px;">Governance Rules for Prompt</div>
-                <div style="display: flex; gap: 5px;">
-                  <button onclick="saveGovRules()" style="padding: 2px 8px; font-size: 11px; background: var(--color-background-success); color: var(--color-text-success); border: 1px solid var(--color-text-success); border-radius: 4px; cursor: pointer;">Save</button>
-                  <button onclick="backupGovRules()" style="padding: 2px 8px; font-size: 11px; background: var(--color-background-secondary); color: var(--color-text-secondary); border: 1px solid var(--color-border-primary); border-radius: 4px; cursor: pointer;">Backup</button>
-                  <button onclick="restoreGovRules()" style="padding: 2px 8px; font-size: 11px; background: var(--color-background-warning); color: var(--color-text-warning); border: 1px solid var(--color-text-warning); border-radius: 4px; cursor: pointer;">Restore</button>
-                </div>
-              </div>
-              <div style="font-size: 11px; color: var(--color-text-secondary); margin-bottom: 8px;">Proprietary frameworks injected verbatim into the prompt. Three-Pillar, methodology rules, anything the AI must apply consistently.</div>
-              <div id="jai-govrules-status" style="font-size: 11px; color: var(--color-text-success); min-height: 14px; margin-bottom: 6px;"></div>
-              <textarea id="jai-govrules" class="form-control" style="min-height: 140px; font-size: 12px; resize: vertical;" placeholder="Three-Pillar Governance Framework:&#10;- Pillar 1: Vendor Accountability and Peer Review&#10;- Pillar 2: Outcome-Based KPIs&#10;- Pillar 3: Strategic Translation"></textarea>
-              <input type="file" id="jai-govrules-file" accept=".json" style="display:none;" onchange="handleGovRulesFile(event)">
             </div>
 
             <!-- Scoring Thresholds -->
@@ -1253,8 +1232,24 @@ input, select, textarea {
 
           </div>
 
-          <!-- ── COL 3: Setup Prompt + JD Prompt (below AI Target card) ─── -->
+          <!-- ── COL 3: Governance Rules + Setup Prompt + JD Prompt ──────── -->
           <div style="display: flex; flex-direction: column; gap: 14px;">
+
+            <!-- Governance Rules -->
+            <div style="padding: 14px 16px; background: var(--color-background-secondary); border-radius: 8px; border-left: 3px solid #16a085;">
+              <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px;">
+                <div style="font-size: 12px; font-weight: 700; color: #16a085; text-transform: uppercase; letter-spacing: 0.6px;">Governance Rules for Prompt</div>
+                <div style="display: flex; gap: 5px;">
+                  <button onclick="saveGovRules()" style="padding: 2px 8px; font-size: 11px; background: var(--color-background-success); color: var(--color-text-success); border: 1px solid var(--color-text-success); border-radius: 4px; cursor: pointer;">Save</button>
+                  <button onclick="backupGovRules()" style="padding: 2px 8px; font-size: 11px; background: var(--color-background-secondary); color: var(--color-text-secondary); border: 1px solid var(--color-border-primary); border-radius: 4px; cursor: pointer;">Backup</button>
+                  <button onclick="restoreGovRules()" style="padding: 2px 8px; font-size: 11px; background: var(--color-background-warning); color: var(--color-text-warning); border: 1px solid var(--color-text-warning); border-radius: 4px; cursor: pointer;">Restore</button>
+                </div>
+              </div>
+              <div style="font-size: 11px; color: var(--color-text-secondary); margin-bottom: 8px;">Proprietary frameworks injected verbatim into the prompt. Three-Pillar, methodology rules, anything the AI must apply consistently.</div>
+              <div id="jai-govrules-status" style="font-size: 11px; color: var(--color-text-success); min-height: 14px; margin-bottom: 6px;"></div>
+              <textarea id="jai-govrules" class="form-control" style="min-height: 140px; font-size: 12px; resize: vertical;" placeholder="Three-Pillar Governance Framework:&#10;- Pillar 1: Vendor Accountability and Peer Review&#10;- Pillar 2: Outcome-Based KPIs&#10;- Pillar 3: Strategic Translation"></textarea>
+              <input type="file" id="jai-govrules-file" accept=".json" style="display:none;" onchange="handleGovRulesFile(event)">
+            </div>
 
             <!-- Setup Prompt -->
             <div style="padding: 14px 16px; background: var(--color-background-secondary); border-radius: 8px; border-left: 3px solid #9b59b6;">
