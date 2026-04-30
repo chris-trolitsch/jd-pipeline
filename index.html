@@ -542,7 +542,7 @@ input, select, textarea {
         <!-- Search -->
         <div style="margin-bottom: 16px;">
           <label style="display: block; font-size: 12px; font-weight: 500; margin-bottom: 6px;">Search</label>
-          <input type="text" id="drawer-search" placeholder="Search applications..." style="width: 100%; padding: 8px; border: 1px solid var(--color-border-primary); border-radius: 4px; font-size: 13px;" onkeydown="handleDrawerSearchKeydown(event)">
+          <input type="text" id="drawer-search" placeholder="Search applications..." style="width: 100%; padding: 8px; border: 1px solid var(--color-border-primary); border-radius: 4px; font-size: 13px;">
         </div>
 
         <!-- Status Filters -->
@@ -8232,7 +8232,7 @@ window.addEventListener('DOMContentLoaded', function() {
 // Stored parsed data waiting for submit
 let adminParsedData = null;
 
-// Show admin tab (triggered by secret passphrase in drawer search)
+// Show admin tab (triggered by feature key unlock)
 function showAdminTab() {
   const btn = document.getElementById('main-tab-admin');
   if (btn) btn.style.display = '';
@@ -8251,25 +8251,7 @@ function hideAdminTab() {
   }
 }
 
-// Handle keydown on drawer search input
-// If Enter is pressed and value === 'Remysarus', reveal admin tab
-function handleDrawerSearchKeydown(event) {
-  if (event.key !== 'Enter') return;
-  const val = document.getElementById('drawer-search').value;
-  if (val === 'Remysarus') {
-    // Clear the field so the phrase is not visible
-    document.getElementById('drawer-search').value = '';
-    showAdminTab();
-    closeDrawer();
-    // Brief confirmation without exposing the phrase
-    const tab = document.getElementById('main-tab-admin');
-    if (tab) {
-      tab.style.outline = '2px solid #0d6efd';
-      setTimeout(() => { tab.style.outline = ''; }, 1200);
-    }
-  }
-  // Normal Enter: apply filters
-}
+// Drawer search input — filtering applied via applyDrawerFilters() on button click
 
 // Parse key:value pupdate / blitz text into a field object
 function parseAdminImport() {
@@ -9252,7 +9234,8 @@ let jobAIData = {
   workmodel: 'any', strengths: '', aiTarget: 'claude'
 };
 
-const JOB_AI_FEATURE_KEY = 'JobAI2026';
+const ADMIN_FEATURE_KEY  = 'admintools';
+const AI_FEATURE_KEY     = 'aianalysis';
 const JOB_AI_STORAGE_KEY = 'jobai-data';
 const SKIP_RULES_KEY     = 'jobai-skiprules';
 const GOV_RULES_KEY      = 'jobai-govrules';
@@ -9264,12 +9247,18 @@ function checkFeatureKey() {
   const status = document.getElementById('feature-key-status');
   if (!input) return;
   const val = input.value.trim();
-  if (val === JOB_AI_FEATURE_KEY) {
+  if (val === ADMIN_FEATURE_KEY) {
+    localStorage.setItem('admin-tab-visible', '1');
+    showAdminTab();
+    input.value = '';
+    status.style.color = 'var(--color-text-success)';
+    status.textContent = 'Admin Tools unlocked.';
+  } else if (val === AI_FEATURE_KEY) {
     localStorage.setItem('jobai-unlocked', '1');
     showJobAITab(true);
     input.value = '';
     status.style.color = 'var(--color-text-success)';
-    status.textContent = 'Job AI unlocked. See the Job AI tab in Data Repository.';
+    status.textContent = 'AI Analysis unlocked. See the AI Analysis tab in Data Repository.';
   } else {
     status.style.color = 'var(--color-text-danger)';
     status.textContent = 'Invalid code. Please check and try again.';
@@ -9282,7 +9271,9 @@ function showJobAITab(show) {
 }
 
 function initJobAIUnlock() {
-  showJobAITab(true); // Always visible — feature lock deactivated
+  if (localStorage.getItem('jobai-unlocked') === '1') {
+    showJobAITab(true);
+  }
 }
 
 // ── Load / Save ───────────────────────────────────────────────────────────────
